@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from flask import session, flash
 
 class Node:
@@ -158,7 +158,7 @@ def CreateTree(input_str: str) -> Optional[Node] :
     return head
 
 
-def PrintTree(head: Node, spacing: int = 2, current_level: int = 0) -> None:
+def PrintTreeNode(head: Node, spacing: int = 2, current_level: int = 0) -> None:
     """
     This function takes in the head of a tree and prints the content out to the console.
 
@@ -173,4 +173,68 @@ def PrintTree(head: Node, spacing: int = 2, current_level: int = 0) -> None:
         return
     
     for node in head.next:
-        PrintTree(node, spacing, current_level + 1)
+        PrintTreeNode(node, spacing, current_level + 1)
+        
+        
+def PrintTreeList(term: List, spacing: int = 2, current_level: int = 0) -> None:
+    """
+    This function takes in a list representing a term and prints the content out to the console.
+
+    Args:
+        term (List): head of the tree you want to display
+        spacing (int): how many whitespaces and dash characters should be used when displaying a new line (has to be > 0)
+        current_level (int): the current level of the tree (this shouldn't be given as a parameter on the first call)
+    """
+    print(' ' * (spacing + 1) * (current_level - 1) + ('+' + '-' * spacing) * (current_level > 0) + term[0])
+    
+    if len(term) == 1: # no more children to look into
+        return
+    
+    for i in range(1, len(term)):
+        PrintTreeList(term[i], spacing, current_level + 1)
+    
+
+def AppendChildrenNodesToList(node: Node) -> List:
+    """
+    This function takes in a node of a tree and returns the contents
+    of its children within a list of lists.
+
+    Args:
+        node (Node): node of the term you want to change the data structure of
+
+    Returns:
+        List: returns the list of lists or [] if there's an error
+    """
+    list = []
+    
+    for child in node.next:
+        list.append(child.value)
+        
+        if child.next != None:
+            list.append(AppendChildrenNodesToList(child))
+        
+    return list
+    
+
+def ChangeTreeToList(head: Node) -> List:
+    """
+    This function takes in the head of a tree and returns the contents within a list of lists.
+
+    Args:
+        head (Node): head of the term you want to change the data structure of
+
+    Returns:
+        List: returns the list of lists or [] if there's an error
+    """
+    list = []
+    
+    if head == None:
+        return list
+    
+    list.append(head.value)
+    
+    list.append(AppendChildrenNodesToList(head))
+    
+    print(list)
+    
+    return list

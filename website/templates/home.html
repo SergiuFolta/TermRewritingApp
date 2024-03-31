@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="text-center">
+    
+<form method="POST" enctype="multipart/form-data">
+
+    <div class="h1 mt-5">
+        <b>Term Rewriting App</b>
+    </div>
+
+    <div class="d-grid col-4 mx-auto mt-5">
+
+        <div class="col">
+            <label class="form-label"><b>Functions: </b></label>
+            {% for function,arity in functions.items() %}
+                {{function}}: {{arity}} 
+                {% if loop.index != functions|length %}, {%endif%}
+            {% endfor %}
+        </div>
+
+        <div class="col mt-2">
+            <label class="form-label"><b>Variables: </b></label>
+            {% for var in variables %}
+                {{var}}
+                {% if loop.index != variables|length %}, {%endif%}
+            {% endfor %}
+        </div>
+
+        <div class="col mt-2">
+            <input class="form-control-lg" type="text" {% if input_string|length > 1 %}value="{{input_string}}"{% else %}placeholder="Term"{% endif %} name="term">
+        </div>
+    
+        <div class="col mt-2">
+            <input class="btn btn-primary btn-lg"  type="submit" name="detect" value="Detect Language">
+        </div>
+        
+        <div class="col mt-2">
+            <input class="btn btn-primary btn-lg"  type="submit" name="create" value="Create Tree">
+        </div>
+
+        <div class="col mt-2">
+            
+        </div>
+
+    </div>
+
+</form>
+
+</div>
+{% endblock %}

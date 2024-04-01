@@ -1,6 +1,6 @@
 import os
 from flask import Blueprint, render_template, request, session, current_app as app
-from website.backend import LoadLanguage, CreateTree, PrintTreeList, ChangeTreeToList
+from website.backend import LoadLanguage, CreateTree, PrintTreeNode
 
 views = Blueprint('views', __name__)
 
@@ -17,8 +17,7 @@ def home():
             
         if request.form.get('create'):
             head = CreateTree(input_string)
-            list = ChangeTreeToList(head)
-            tree = PrintTreeList(list)
+            tree = PrintTreeNode(head)
             
     
     functions = session["functions"] if "functions" in session else {}

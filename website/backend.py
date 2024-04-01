@@ -158,7 +158,7 @@ def CreateTree(input_str: str) -> Optional[Node] :
     return head
 
 
-def PrintTreeNode(head: Node, spacing: int = 2, current_level: int = 0) -> None:
+def PrintTreeNode(head: Node, spacing: int = 2, current_level: int = 0) -> str:
     """
     This function takes in the head of a tree and prints the content out to the console.
 
@@ -166,45 +166,27 @@ def PrintTreeNode(head: Node, spacing: int = 2, current_level: int = 0) -> None:
         head (Node): head of the tree you want to display
         spacing (int): how many whitespaces and dash characters should be used when displaying a new line (has to be > 0)
         current_level (int): the current level of the tree (this shouldn't be given as a parameter on the first call)
-    """
-    print(' ' * (spacing + 1) * (current_level - 1) + ('+' + '-' * spacing) * (current_level > 0) + head.value)
-    
-    if head.next == None: # no more children to look into
-        return
-    
-    for node in head.next:
-        PrintTreeNode(node, spacing, current_level + 1)
-        
-        
-def PrintTreeList(term: List, spacing: int = 2, current_level: int = 0) -> str:
-    """
-    This function takes in a list representing a term and prints the content out to the console.
-
-    Args:
-        term (List): head of the tree you want to display
-        spacing (int): how many whitespaces and dash characters should be used when displaying a new line (has to be > 0)
-        current_level (int): the current level of the tree (this shouldn't be given as a parameter on the first call)
 
     Returns:
         str: returns the list representation as a string
     """
-    
-    string = ""
+    tree_repr = ""
     
     if spacing <= 0:
         raise ValueError("spacing must be greater than 0")
 
-    stack = [(term, current_level)]
+    stack = [(head, current_level)]
     while stack:
         node, level = stack.pop()
 
-        string += (' ' * (spacing + 1) * (level - 1) + ('+' + '-' * spacing) * (level > 0) + node[0]) + "\n"
+        tree_repr += (' ' * (spacing + 1) * (level - 1) + ('+' + '-' * spacing) * (level > 0) + node.value) + '\n'
 
-        if len(node) > 1:  # Check if there are children (more than one element)
-            for child in node[1:]:
+        if node.next != None:
+            for child in reversed(node.next):  # Iterate through children
                 stack.append((child, level + 1))
+        
+    return tree_repr
     
-    return string
 
 def AppendChildrenNodesToList(node: Node) -> List:
     """

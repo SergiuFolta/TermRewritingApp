@@ -176,7 +176,7 @@ def PrintTreeNode(head: Node, spacing: int = 2, current_level: int = 0) -> None:
         PrintTreeNode(node, spacing, current_level + 1)
         
         
-def PrintTreeList(term: List, spacing: int = 2, current_level: int = 0) -> None:
+def PrintTreeList(term: List, spacing: int = 2, current_level: int = 0) -> str:
     """
     This function takes in a list representing a term and prints the content out to the console.
 
@@ -184,7 +184,12 @@ def PrintTreeList(term: List, spacing: int = 2, current_level: int = 0) -> None:
         term (List): head of the tree you want to display
         spacing (int): how many whitespaces and dash characters should be used when displaying a new line (has to be > 0)
         current_level (int): the current level of the tree (this shouldn't be given as a parameter on the first call)
+
+    Returns:
+        str: returns the list representation as a string
     """
+    
+    string = ""
     
     if spacing <= 0:
         raise ValueError("spacing must be greater than 0")
@@ -193,12 +198,13 @@ def PrintTreeList(term: List, spacing: int = 2, current_level: int = 0) -> None:
     while stack:
         node, level = stack.pop()
 
-        print(' ' * (spacing + 1) * (level - 1) + ('+' + '-' * spacing) * (level > 0) + node[0])
+        string += (' ' * (spacing + 1) * (level - 1) + ('+' + '-' * spacing) * (level > 0) + node[0]) + "\n"
 
         if len(node) > 1:  # Check if there are children (more than one element)
             for child in node[1:]:
                 stack.append((child, level + 1))
     
+    return string
 
 def AppendChildrenNodesToList(node: Node) -> List:
     """

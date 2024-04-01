@@ -185,13 +185,19 @@ def PrintTreeList(term: List, spacing: int = 2, current_level: int = 0) -> None:
         spacing (int): how many whitespaces and dash characters should be used when displaying a new line (has to be > 0)
         current_level (int): the current level of the tree (this shouldn't be given as a parameter on the first call)
     """
-    print(' ' * (spacing + 1) * (current_level - 1) + ('+' + '-' * spacing) * (current_level > 0) + term[0])
     
-    if len(term) == 1: # no more children to look into
-        return
-    
-    for i in range(1, len(term)):
-        PrintTreeList(term[i], spacing, current_level + 1)
+    if spacing <= 0:
+        raise ValueError("spacing must be greater than 0")
+
+    stack = [(term, current_level)]
+    while stack:
+        node, level = stack.pop()
+
+        print(' ' * (spacing + 1) * (level - 1) + ('+' + '-' * spacing) * (level > 0) + node[0])
+
+        if len(node) > 1:  # Check if there are children (more than one element)
+            for child in node[1:]:
+                stack.append((child, level + 1))
     
 
 def AppendChildrenNodesToList(node: Node) -> List:

@@ -41,9 +41,14 @@
             <input class="btn btn-primary btn-lg"  type="submit" name="create" value="Create Tree">
         </div>
 
+        {% if tree|length > 1 %}
         <div class="col mt-2">
-            
+            <b>Tree Representation</b>
         </div>
+
+        <div class="col text-start mt-2" style="white-space: pre-wrap; word-spacing: 3px;">{{tree}}</div>
+
+        {% endif %}
 
     </div>
 

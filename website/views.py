@@ -11,6 +11,7 @@ def home():
     
     if request.method == 'POST':
         input_string = request.form.get('term')
+        session["input_string"] = input_string
         
         if request.form.get('detect'):
             LoadLanguage(input_string)

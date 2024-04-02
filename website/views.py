@@ -1,6 +1,6 @@
 import os
 from flask import Blueprint, render_template, request, session, current_app as app
-from website.backend import LoadLanguage, CreateTree, PrintTreeNode
+from website.backend import LoadLanguage, CreateTree, PrintTreeNode, ChangeTreeToList, SaveTerm
 
 views = Blueprint('views', __name__)
 

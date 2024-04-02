@@ -6,7 +6,7 @@ views = Blueprint('views', __name__)
 
 @views.route('/', methods=['GET', 'POST'])
 def home():
-    input_string = ""
+    input_string = session["input_string"] if "input_string" in session else ""
     tree = ""
     
     if request.method == 'POST':

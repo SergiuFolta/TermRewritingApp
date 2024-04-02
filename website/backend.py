@@ -50,19 +50,30 @@ def LoadLanguage(input_str: str) -> None:
             while i + 1 < len(input_str) and input_str[i + 1] not in "(), ":
                 i += 1
                 term += input_str[i]
+            
+            check = i
+            while check + 1 < len(input_str) and input_str[check + 1] == " ":
+                check += 1
+                pass
                 
             if i + 1 == len(input_str): # this should just be an atomic variable
                 if len(variables) + len(functions) == 0: # this should be the ONLY term
                     variables.add(term)
                 else:
                     flash("ERROR: String invalid. It ends with a term, but it's not an atomic term.", category='error')
+                    return
             
+            if check != i and input_str[check + 1] not in ",)":
+                flash("ERROR: You either need a comma between variables in the same function or to close the function.", category="error")
+                return
+                
             if term not in variables and term not in functions:
                 if input_str[i + 1] == "(": # this has to be a function accepting at least one argument
                     functions[term] = CountArguments(input_str[i + 1:])
                     
                     if functions[term] == -1:
                         flash("ERROR: String is invalid, couldn't determine number of arguments for function {term}!", category='error')
+                        return
                 else: # this is either a constant or a variable. No way to tell, so we're just putting it as a variable for now
                     variables.add(term)
             elif term in functions: 
@@ -72,6 +83,7 @@ def LoadLanguage(input_str: str) -> None:
                     if arguments != functions[term]:
                         flash(f"ERROR: Function {term} found again, taking a different number of arguments than before! \
                                 Found {functions[term]} before, now found {arguments}.", category='error')
+                        return
         
         i += 1
     
@@ -228,7 +240,5 @@ def ChangeTreeToList(head: Node) -> List:
     list.append(head.value)
     
     list.append(AppendChildrenNodesToList(head))
-    
-    print(list)
     
     return list

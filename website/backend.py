@@ -118,7 +118,7 @@ def CreateTree(input_str: str) -> Optional[Node] :
         
         if str in functions.keys(): # if current char represents a function
             if current_node.value != "":
-                flash("Error in string! More than one function is trying to occupy the same node!", category='error')
+                flash("ERROR: More than one function is trying to occupy the same node!", category='error')
                 return None
             current_node.value = str # first we note this down
             
@@ -129,25 +129,29 @@ def CreateTree(input_str: str) -> Optional[Node] :
                     current_node.next.append(Node(previous=current_node))
         elif str == '(':
             if current_node.next == None:
-                flash("Error in string! There's an open paranthesis, but we're not expecting any arguments!", category='error')
+                flash("ERROR: There's an open paranthesis, but we're not expecting any arguments!", category='error')
                 return None
             
             current_node = current_node.next[0] # we go in the first Node in the list of children of the current one
         elif str == ')':
             if current_node.previous == None:
-                flash("Error in string! There are too many closed parantheses!", category='error')
+                flash("ERROR: There are too many closed parantheses!", category='error')
                 return None
             
             if current_node.next != None:
                 for node in current_node.next:
                     if node.value == "":
-                        flash("Error in string! Function is still expecting arguments!", category='error')
+                        flash("ERROR: Function is still expecting arguments!", category='error')
                         return None
+            
+            if current_node.value == "":
+                flash("ERROR: Function is still expecting arguments!", category='error')
+                return None
             
             current_node = current_node.previous # we jump one level above our current one
         elif str == ',':
             if current_node.previous == None: # if there is no higher level to jump to
-                flash("Error in string! Too many commas!", category='error')
+                flash("ERROR: Too many commas!", category='error')
                 return None
             
             current_node = current_node.previous # we need to jump a level up
@@ -158,11 +162,11 @@ def CreateTree(input_str: str) -> Optional[Node] :
                     break
                 
             if current_node == initial_node: # we couldn't find an unpopulated Node
-                flash("Error in string! Function given more arguments than it can accept!", category='error')
+                flash("ERROR: Function given more arguments than it can accept!", category='error')
                 return None
         elif str in variables:
             if current_node.value != "":
-                flash("Error in string! More than one variable is trying to occupy the same node!", category='error')
+                flash("ERROR: More than one variable is trying to occupy the same node!", category='error')
                 return None
             
             current_node.value = str
@@ -191,6 +195,10 @@ def PrintTreeNode(head: Node, spacing: int = 2, current_level: int = 0) -> str:
     while stack:
         node, level = stack.pop()
 
+        if node == None:
+            flash("ERROR: Could not create tree.", category="error")
+            return
+        
         tree_repr += (' ' * (spacing + 1) * (level - 1) + ('+' + '-' * spacing) * (level > 0) + node.value) + '\n'
 
         if node.next != None:

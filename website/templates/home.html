@@ -45,8 +45,32 @@
         <div class="col mt-2">
             <b>Tree Representation</b>
         </div>
+        {% macro PrintTree(list) -%}
+        {% for l in list %}
+            {% if l is iterable and (l is not string and l is not mapping) %}
+            
+            {% elif list[loop.index] and (list[loop.index]is iterable and (list[loop.index] is not string and list[loop.index] is not mapping))%}
+            <li>
+                <details open>
+                    <summary><b>{{l}}</b></summary>
+                    <ul>
+                    {{ PrintTree(list[loop.index])}}
+                    </ul>
+                </details>
+            </li>
+            {% else %}
+            <li>
+            <b>{{l}}</b>
+            </li>
+            {% endif %}
+        {% endfor %}
+        {% endmacro -%}
 
-        <div class="col text-start mt-2" style="white-space: pre-wrap; word-spacing: 3px;">{{tree}}</div>
+        <div class="text-start mt-2">
+            <ul class="tree">
+            {{ PrintTree(tree) }}
+            </ul>
+        </div>
 
         {% endif %}
 

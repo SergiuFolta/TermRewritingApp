@@ -18,7 +18,7 @@ def home():
             
         if request.form.get('create'):
             head = CreateTree(input_string)
-            tree = PrintTreeNode(head)
+            tree = ChangeTreeToList(head)
             
     
     functions = session["functions"] if "functions" in session else {}

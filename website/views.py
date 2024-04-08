@@ -1,6 +1,6 @@
 import os
 from flask import Blueprint, render_template, request, session, current_app as app
-from website.backend import *
+from website.backend.backend import *
 
 views = Blueprint('views', __name__)
 
@@ -35,6 +35,8 @@ def functions():
             function_arity = int(request.form.get('aritynew'))
             AddFunction(function_name, function_arity)
             
+            functions = dict(sorted(session["functions"].items()))
+            
         for i,f in enumerate(functions.keys()):
             if request.form.get('modify' + str(i + 1)):
                 function_name = request.form.get('function' + str(i + 1))
@@ -43,24 +45,30 @@ def functions():
                 break
             
             if  request.form.get('delete' + str(i + 1)):
+                DeleteFunction(f)
                 break
     
     return render_template("functions.html", functions = functions)
 
 @views.route('/variables', methods=['GET', 'POST'])
 def variables():
-    variables = session["variables"] if "variables" in session else set([])
+    variables = set(session["variables"]) if "variables" in session else set([])
     
     if request.method == 'POST':
         if request.form.get('addnew'):
             var_name = request.form.get('varnew')
+            AddVariable(var_name)
             
         for i,v in enumerate(variables):
             if request.form.get('modify' + str(i + 1)):
                 var_name = request.form.get('var' + str(i + 1))
+                ModifyVariable(v, var_name)
                 break
             
             if  request.form.get('delete' + str(i + 1)):
+                DeleteVariable(v)
                 break
+            
+        variables = set(session["variables"])
     
     return render_template("variables.html", variables = variables)

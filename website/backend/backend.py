@@ -1,5 +1,7 @@
 from typing import Optional, List, Tuple
 from flask import session, flash
+from website.backend.variables import *
+from website.backend.functions import *
 
 class Node:
     def __init__(self, value="", previous=None, next=None):
@@ -226,52 +228,6 @@ def GetSubtermAtPosition(position: str, term: List) -> List:
         List: returns the list of lists or [] if there's an error
     """
     pass
-
-
-def ModifyFunction(old_function_name: str, curr_function_name: str, function_arity: int) -> None:
-    """
-    This function modifies an entry in the function dictionary.
-
-    Args:
-        old_function_name (str): old name of the function (can be the same as curr_function_name)
-        curr_function_name (str): current name of the function (can be the same as old_function_name)
-        function_arity (int): arity of the function (value of the key in the dictionary)
-    """
-    if "functions" not in session:
-        flash("ERROR: There are no functions loaded in the session.", category="error")
-        return
-    
-    functions = session["functions"]
-    
-    if old_function_name not in functions:
-        flash(f"ERROR: Could not find function {old_function_name} in dictionary!", category="error")
-        return
-
-    if old_function_name != curr_function_name: # modify the function key name if requsted
-        functions[curr_function_name] = functions.pop(old_function_name)
-    
-    functions[curr_function_name] = function_arity # modify the function arity
-    
-    session["functions"] = functions
-
-
-def AddFunction(function_name: str, function_arity: int) -> None:
-    """
-    This function adds an entry in the function dictionary.
-
-    Args:
-        function_name (str): name of the function to add (the key in the dictionary)
-        function_arity (int): arity of the function (value of the key in the dictionary)
-    """
-    functions = session["functions"] if "functions" in session else {}
-
-    if function_name in functions:
-        flash(f"ERROR: There is already a function with the name {function_name} in our dictionary!", category="error")
-        return
-
-    functions[function_name] = function_arity
-    
-    session["functions"] = functions
     
 
 def AppendChildrenNodesToList(node: Node) -> List:

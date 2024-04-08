@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Variables{% endblock %}
+
+{% block content %}
+<div class="text-center">
+    
+<form method="POST" enctype="multipart/form-data">
+
+    <div class="h1 mt-5">
+        <b>Variables</b>
+    </div>
+
+    <div class="d-grid col-7 mx-auto mt-5">
+            
+        {% for var in variables %}
+
+        <div class="col mt-2">
+            
+            <input class="form-control-md" type="text" value="{{var}}" name="var{{loop.index}}">
+            <input class="btn btn-primary btn-md"  type="submit" name="modify{{loop.index}}" value="Modify Variable">
+            <input class="btn btn-primary btn-md"  type="submit" name="delete{{loop.index}}" value="Delete Variable">
+
+        </div>
+            
+        {% endfor %}
+
+        <div class="h2 mt-2">
+            <b>Add a New Variable</b>
+        </div>
+
+        <div class="col mt-2">
+            
+            <input class="form-control-md" type="text" placeholder="Variable Name" name="varnew">
+            <input class="btn btn-primary btn-md"  type="submit" name="addnew" value="Add Variable">
+
+        </div>
+
+    </div>
+
+</form>
+
+</div>
+{% endblock %}

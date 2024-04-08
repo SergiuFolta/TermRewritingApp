@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Functions{% endblock %}
 
 {% block content %}
 <div class="text-center">
@@ -11,15 +11,16 @@
         <b>Functions</b>
     </div>
 
-    <div class="d-grid col-5 mx-auto mt-5">
+    <div class="d-grid col-7 mx-auto mt-5">
             
         {% for function,arity in functions.items() %}
 
         <div class="col mt-2">
             
             <input class="form-control-md" type="text" value="{{function}}" name="function{{loop.index}}">
-            <input class="form-control-md" type="text" value="{{arity}}" name="arity{{loop.index}}">
+            <input class="form-control-md" type="number" min="0" value="{{arity}}" name="arity{{loop.index}}">
             <input class="btn btn-primary btn-md"  type="submit" name="modify{{loop.index}}" value="Modify Function">
+            <input class="btn btn-primary btn-md"  type="submit" name="delete{{loop.index}}" value="Delete Function">
 
         </div>
             
@@ -32,7 +33,7 @@
         <div class="col mt-2">
             
             <input class="form-control-md" type="text" placeholder="Function Name" name="functionnew">
-            <input class="form-control-md" type="text" placeholder="Arity" name="aritynew">
+            <input class="form-control-md" type="number" min="0" placeholder="Arity" name="aritynew">
             <input class="btn btn-primary btn-md"  type="submit" name="addnew" value="Add Function">
 
         </div>

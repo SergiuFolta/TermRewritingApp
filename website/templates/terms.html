@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Terms{% endblock %}
+
+{% block content %}
+<div class="text-center">
+    
+<form method="POST" enctype="multipart/form-data">
+
+    <div class="h1 mt-5">
+        <b>Terms</b>
+    </div>
+
+    <div class="d-grid col-4 mx-auto mt-5">
+
+        <div class="col">
+            <label class="form-label"><b>Functions: </b></label>
+            {% for function,arity in functions.items() %}
+                <b>{{function}}: {{arity}}</b>
+                {% if loop.index != functions|length %}<b>, </b>{%endif%}
+            {% endfor %}
+        </div>
+
+        <div class="col mt-2">
+            <label class="form-label"><b>Variables: </b></label>
+            {% for var in variables %}
+                <b>{{var}}</b>
+                {% if loop.index != variables|length %}<b>, </b>{%endif%}
+            {% endfor %}
+        </div>
+        
+        <div class="col mt-2">
+            <select class="form-select" name="term">
+                {% for term in terms %}
+                <option value="{{ term }}">{{ term }}</option>
+                {% endfor %}
+            </select>
+            <input class="btn btn-primary btn-lg mt-2"  type="submit" name="display" value="Display Tree">
+        </div>
+
+        {% if tree %}
+        <div class="col mt-2">
+            <b>Tree Representation</b>
+        </div>
+        {% macro PrintTree(list) -%}
+        {% for l in list %}
+            {% if l is iterable and (l is not string and l is not mapping) %}
+            
+            {% elif list[loop.index] and (list[loop.index]is iterable and (list[loop.index] is not string and list[loop.index] is not mapping))%}
+            <li>
+                <details open>
+                    <summary><b>{{l}}</b></summary>
+                    <ul>
+                    {{ PrintTree(list[loop.index])}}
+                    </ul>
+                </details>
+            </li>
+            {% else %}
+            <li>
+            <b>{{l}}</b>
+            </li>
+            {% endif %}
+        {% endfor %}
+        {% endmacro -%}
+
+        <div class="text-start mt-2">
+            <ul class="tree">
+            {{ PrintTree(tree) }}
+            </ul>
+        </div>
+
+        {% endif %}
+
+    </div>
+
+    <div class="col mt-2">
+        <input class="btn btn-primary btn-lg"  type="submit" name="home" value="Home Page">
+    </div>
+
+</form>
+
+</div>
+{% endblock %}

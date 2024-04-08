@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Create Term{% endblock %}
+
+{% block content %}
+<div class="text-center">
+    
+<form method="POST" enctype="multipart/form-data">
+
+    <div class="h1 mt-5">
+        <b>Create Term</b>
+    </div>
+
+    <div class="d-grid col-4 mx-auto mt-5">
+
+        <div class="col">
+            <label class="form-label"><b>Functions: </b></label>
+            {% for function,arity in functions.items() %}
+                <b>{{function}}: {{arity}}</b>
+                {% if loop.index != functions|length %}<b>, </b>{%endif%}
+            {% endfor %}
+        </div>
+
+        <div class="col mt-2">
+            <label class="form-label"><b>Variables: </b></label>
+            {% for var in variables %}
+                <b>{{var}}</b>
+                {% if loop.index != variables|length %}<b>, </b>{%endif%}
+            {% endfor %}
+        </div>
+
+        <div class="col mt-2">
+            <input class="form-control-lg" type="text" {% if term_name|length > 1 %}value="{{term_name}}"{% else %}placeholder="Term Name"{% endif %} name="name">
+        </div>
+
+        <div class="col mt-2">
+            <input class="form-control-lg" type="text" {% if term_string|length > 1 %}value="{{term_string}}"{% else %}placeholder="Term String"{% endif %} name="string">
+        </div>
+    
+        <div class="col mt-2">
+            <input class="btn btn-primary btn-lg"  type="submit" name="detect" value="Detect Language">
+            <input class="btn btn-primary btn-lg"  type="submit" name="save" value="Save Term">
+        </div>
+
+    </div>
+
+    <div class="col mt-2">
+        <input class="btn btn-primary btn-lg"  type="submit" name="home" value="Home Page">
+    </div>
+
+</form>
+
+</div>
+{% endblock %}

@@ -191,21 +191,87 @@ def PrintTreeNode(head: Node, spacing: int = 2, current_level: int = 0) -> str:
     if spacing <= 0:
         raise ValueError("spacing must be greater than 0")
 
-    stack = [(head, current_level)]
+    stack = [(head, current_level, "0")]
     while stack:
-        node, level = stack.pop()
+        node, level, node_pos = stack.pop()
 
         if node == None:
             flash("ERROR: Could not create tree.", category="error")
             return
         
-        tree_repr += (' ' * (spacing + 1) * (level - 1) + ('+' + '-' * spacing) * (level > 0) + node.value) + '\n'
+        tree_repr += (' ' * (spacing + 1) * (level - 1) + ('+' + '-' * spacing) * (level > 0) + node.value) + \
+                        (f" ({node_pos})" if node != head else "") + '\n'
 
         if node.next != None:
-            for child in reversed(node.next):  # Iterate through children
-                stack.append((child, level + 1))
+            node_pos += "_0" if node != head else ""
+            for child in node.next:  # Iterate through children
+                node_pos = node_pos[:node_pos.rfind("_") + 1] + str(int(node_pos[node_pos.rfind("_") + 1:]) + 1)
+                stack.append((child, level + 1, node_pos))
+                
+            stack[len(stack) - len(node.next):] = reversed(stack[len(stack) - len(node.next):])
         
     return tree_repr
+    
+
+def GetSubtermAtPosition(position: str, term: List) -> List:
+    """
+    This function takes in a position from the term and returns the subterm from
+    that position onward.
+
+    Args:
+        node (Node): node of the term you want to change the data structure of
+        term (List): list representing a term
+
+    Returns:
+        List: returns the list of lists or [] if there's an error
+    """
+    pass
+
+
+def ModifyFunction(old_function_name: str, curr_function_name: str, function_arity: int) -> None:
+    """
+    This function modifies an entry in the function dictionary.
+
+    Args:
+        old_function_name (str): old name of the function (can be the same as curr_function_name)
+        curr_function_name (str): current name of the function (can be the same as old_function_name)
+        function_arity (int): arity of the function (value of the key in the dictionary)
+    """
+    if "functions" not in session:
+        flash("ERROR: There are no functions loaded in the session.", category="error")
+        return
+    
+    functions = session["functions"]
+    
+    if old_function_name not in functions:
+        flash(f"ERROR: Could not find function {old_function_name} in dictionary!", category="error")
+        return
+
+    if old_function_name != curr_function_name: # modify the function key name if requsted
+        functions[curr_function_name] = functions.pop(old_function_name)
+    
+    functions[curr_function_name] = function_arity # modify the function arity
+    
+    session["functions"] = functions
+
+
+def AddFunction(function_name: str, function_arity: int) -> None:
+    """
+    This function adds an entry in the function dictionary.
+
+    Args:
+        function_name (str): name of the function to add (the key in the dictionary)
+        function_arity (int): arity of the function (value of the key in the dictionary)
+    """
+    functions = session["functions"] if "functions" in session else {}
+
+    if function_name in functions:
+        flash(f"ERROR: There is already a function with the name {function_name} in our dictionary!", category="error")
+        return
+
+    functions[function_name] = function_arity
+    
+    session["functions"] = functions
     
 
 def AppendChildrenNodesToList(node: Node) -> List:
@@ -287,6 +353,7 @@ def AppendChildrenToNode(term: List, current_node: Node) -> None:
                 current_node.next = []
             
             current_node.next.append(Node(value = elem, previous = current_node))
+
 
 def ChangeListToTree(term: List) -> Optional[Node]:
     """

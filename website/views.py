@@ -27,8 +27,6 @@ def home():
 
 @views.route('/functions', methods=['GET', 'POST'])
 def functions():
-    input_string = session["input_string"] if "input_string" in session else ""
-    
     if request.method == 'POST':
         pass
             

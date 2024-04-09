@@ -14,12 +14,14 @@ def CountArguments(function_str: str) -> int:
     """
         This function counts the number of arguments a function has.
     Args:
-        function_str (str): the remainder of the input string after the function character was found
+        function_str (str): the remainder of the input string after the function character was found e.g
+                            f(x, y) would mean function_str = "(x, y)"
 
     Returns:
         int: number of arguments this function has. returns -1 if it's an invalid string
     """
-    arguments = 1
+    function_str = function_str.replace(" ", "")
+    arguments = 0 # assume this is a constant function
                     
     open_brackets = 1
     i = 0
@@ -31,7 +33,9 @@ def CountArguments(function_str: str) -> int:
             open_brackets += 1
         elif function_str[i] == ")":
             open_brackets -= 1
-            
+        elif arguments == 0: # if this is not ",", "(" or ")" and arguments is 0, this means this is not a constant function as we assumed
+            arguments = 1
+        
     return arguments if open_brackets == 0 else -1
 
 

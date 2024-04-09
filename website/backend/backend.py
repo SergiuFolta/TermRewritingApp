@@ -46,8 +46,8 @@ def LoadLanguage(input_str: str) -> None:
     Args:
         input_str (str): term to load the language from
     """
-    functions = {}
-    variables = set([])
+    functions = session["functions"] if "functions" in session else {}
+    variables = set(session["variables"]) if "variables" in session else set([]) # sets aren't JSON serializable
     
     i = 0
     while i < len(input_str):
@@ -74,22 +74,49 @@ def LoadLanguage(input_str: str) -> None:
                 return
                 
             if term not in variables and term not in functions:
-                if input_str[i + 1] == "(": # this has to be a function accepting at least one argument
-                    functions[term] = CountArguments(input_str[i + 1:])
+                next_char_index = input_str.find("(", i + 1)
+                if next_char_index == -1: # this is certainly a variable
+                    variables.add(term)
+                elif input_str[i + 1:next_char_index].count(" ") != (next_char_index - (i + 1)): 
+                    # if there aren't just whitespaces, then the "(" is most likely from another function. Assume this is a variable
+                    variables.add(term)
+                
+                if input_str[next_char_index] == "(": # this has to be a function
+                    functions[term] = CountArguments(input_str[next_char_index:])
                     
                     if functions[term] == -1:
-                        flash("ERROR: String is invalid, couldn't determine number of arguments for function {term}!", category='error')
+                        flash(f"ERROR: String is invalid, couldn't determine number of arguments for function {term}!", category='error')
                         return
-                else: # this is either a constant or a variable. No way to tell, so we're just putting it as a variable for now
+                else: # this is a variable
                     variables.add(term)
-            elif term in functions: 
-                if input_str[i + 1] == "(": # this has to be a function accepting at least one argument
-                    arguments = CountArguments(input_str[i + 1:])
+            elif term in functions:
+                next_char_index = input_str.find("(", i + 1)
+                if next_char_index == -1:
+                    flash(f"ERROR: {term} found again, should be a function but is now a variable."
+                            , category='error')
+                    return
+                elif functions[term] == 0 and input_str[i + 1:next_char_index].count(" ") != (next_char_index - (i + 1)): 
+                    # if there aren't just whitespaces, then the "(" is most likely from another function. 
+                    # Assume this is a constant function that was previously written with "()" notation
+                    i += 1
+                    continue
+                    
+                if input_str[next_char_index] == "(": # this has to be a function
+                    arguments = CountArguments(input_str[next_char_index:])
                     
                     if arguments != functions[term]:
                         flash(f"ERROR: Function {term} found again, taking a different number of arguments than before! \
                                 Found {functions[term]} before, now found {arguments}.", category='error')
                         return
+                else: # this was previously recognized as a function, but is now a variable
+                    flash(f"ERROR: {term} was previously a function, but is a variable in this term!", category="error")
+                    return
+            elif term in variables:
+                next_char_index = input_str.find("(", i + 1)
+                if input_str[i + 1:next_char_index].count(" ") == (next_char_index - (i + 1)):
+                    # this means this is a function in our string, but was previously a variable
+                    flash(f"ERROR: {term} found again, should be a variable but is now a function." , category='error')
+                    return
         
         i += 1
     
@@ -109,7 +136,7 @@ def CreateTree(input_str: str) -> Optional[Node] :
     """
     
     functions = session["functions"] if "functions" in session else {}
-    variables = session["variables"] if "variables" in session else set([]) # sets aren't JSON serializable
+    variables = set(session["variables"]) if "variables" in session else set([]) # sets aren't JSON serializable
     
     head = Node()
     current_node = head
@@ -134,11 +161,12 @@ def CreateTree(input_str: str) -> Optional[Node] :
                 for _ in range(0, functions[str]): # then we add as many further Nodes as the function has possible arguments
                     current_node.next.append(Node(previous=current_node))
         elif str == '(':
-            if current_node.next == None:
+            if current_node.next == None and current_node.value not in functions:
                 flash("ERROR: There's an open paranthesis, but we're not expecting any arguments!", category='error')
                 return None
             
-            current_node = current_node.next[0] # we go in the first Node in the list of children of the current one
+            if functions[current_node.value] > 0:
+                current_node = current_node.next[0] # we go in the first Node in the list of children of the current one
         elif str == ')':
             if current_node.previous == None:
                 flash("ERROR: There are too many closed parantheses!", category='error')
@@ -154,7 +182,9 @@ def CreateTree(input_str: str) -> Optional[Node] :
                 flash("ERROR: Function is still expecting arguments!", category='error')
                 return None
             
-            current_node = current_node.previous # we jump one level above our current one
+            modified_str = input_str[:i + 1].replace(" ", "")
+            if len(modified_str) - 1 - modified_str.rfind("(") != 1: # this would otherwise be a constant function and we don't want to jump
+                current_node = current_node.previous # we jump one level above our current one
         elif str == ',':
             if current_node.previous == None: # if there is no higher level to jump to
                 flash("ERROR: Too many commas!", category='error')
@@ -168,6 +198,7 @@ def CreateTree(input_str: str) -> Optional[Node] :
                     break
                 
             if current_node == initial_node: # we couldn't find an unpopulated Node
+                print(current_node.value)
                 flash("ERROR: Function given more arguments than it can accept!", category='error')
                 return None
         elif str in variables:

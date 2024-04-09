@@ -1,13 +1,9 @@
 from typing import Optional, List, Tuple
 from flask import session, flash
-from website.backend.variables import *
-from website.backend.functions import *
-
-class Node:
-    def __init__(self, value="", previous=None, next=None):
-        self.value = value
-        self.previous = previous
-        self.next = next
+from .variables import *
+from .functions import *
+from .node import Node
+from .representation_changes import ChangeListToTree, ChangeTreeToList
 
 
 def CountArguments(function_str: str) -> int:
@@ -211,7 +207,7 @@ def CreateTree(input_str: str) -> Optional[Node] :
     return head
 
 
-def PrintTreeNode(head: Node, spacing: int = 2, current_level: int = 0) -> str:
+def PrintTree(head: Node, spacing: int = 2, current_level: int = 0) -> str:
     """
     This function takes in the head of a tree and prints the content out to the console.
 
@@ -250,140 +246,42 @@ def PrintTreeNode(head: Node, spacing: int = 2, current_level: int = 0) -> str:
     return tree_repr
     
 
-def GetSubtermAtPosition(position: str, term: List) -> List:
+def GetSubtermAtPosition(term: List, position: str = "") -> List:
     """
     This function takes in a position from the term and returns the subterm from
     that position onward.
 
     Args:
-        node (Node): node of the term you want to change the data structure of
+        position (str): position of the subterm you'd like to get (in format "{number}_{number}_{number}").
+                        If you want to get the root, position is = ""
         term (List): list representing a term
 
     Returns:
         List: returns the list of lists or [] if there's an error
     """
-    pass
+    if position == "":
+        return term
     
-
-def AppendChildrenNodesToList(node: Node) -> List:
-    """
-    This function takes in a node of a tree and returns the contents
-    of its children within a list of lists.
-
-    Args:
-        node (Node): node of the term you want to change the data structure of
-
-    Returns:
-        List: returns the list of lists or [] if there's an error
-    """
-    list = []
+    indeces = position.split("_")
     
-    for child in node.next:
-        list.append(child.value)
+    for index in indeces:
+        term = term[1]
+        index = int(index) - 1
         
-        if child.next != None:
-            list.append(AppendChildrenNodesToList(child))
+        subterms = []
+        for item in term:
+            if type(item) == list:
+                subterms[-1].append(item)
+            else:
+                subterms.append([item])
         
-    return list
-    
-
-def ChangeTreeToList(head: Node) -> List:
-    """
-    This function takes in the head of a tree and returns the contents within a list of lists.
-
-    Args:
-        head (Node): head of the term you want to change the data structure of
-
-    Returns:
-        List: returns the list of lists or [] if there's an error
-    """
-    list = []
-    
-    if head == None:
-        return list
-    
-    list.append(head.value)
-    
-    list.append(AppendChildrenNodesToList(head))
-    
-    return list
-
-
-def AppendChildrenToNode(term: List, current_node: Node) -> None:
-    """
-    This function takes in a sublist of a list and returns the contents
-    of its children within a tree structure.
-
-    Args:
-        term (List): sublist of the term you want to change the data structure of
-
-    Returns:
-        Optional[Node]: returns the tree structure or [] if there's an error
-    """
-    # ['f1', ['f2', ['i1', ['e'], 'i', ['f', ['x', 'y']]], 'i', ['f', ['i', ['x'], 'y']]]]
-    if len(term) == 1:
-        current_node.value = term[0]
-        return
-    
-    child_index = 0
-    
-    for elem in term:
-        if type(elem) == list:
-            if current_node.next == None:
-                flash("ERROR: There isn't a Node to continue forward with the list!", category="error")
-                return
-            
-            if child_index == len(current_node.next):
-                flash("ERROR: This function can't accept any more children!", category="error")
-                return
-            
-            AppendChildrenToNode(elem, current_node.next[child_index])
-            child_index += 1
-        else:
-            if current_node.next == None:
-                current_node.next = []
-            
-            current_node.next.append(Node(value = elem, previous = current_node))
-
-
-def ChangeListToTree(term: List) -> Optional[Node]:
-    """
-    This function takes in a list of lists and returns the contents within the form of a tree.
-
-    Args:
-        term (List): the list of lists representing a term
-
-    Returns:
-        Optional[Node]: returns the head of the tree or None if there's an error
-    """
-    if term == []:
-        flash("ERROR: Can't take in an empty list!", category="error")
-        return None
-    
-    head = Node(term[0])
-    AppendChildrenToNode(term[1], head)
-    
-    return head
-
-
-def LoadTerm(name: str) -> Optional[Tuple[str, List]]:
-    """
-    This function takes in the head of a tree and returns the contents within a list of lists.
-
-    Args:
-        name (str): the name by which to remember this term
-
-    Returns:
-        Optional[Tuple[str, List]]: returns a tuple with the string representation 
-        and the list of lists or None if there's an error
-    """
-    term_dictionary = session["terms"] if "terms" in session else {}
-    
-    if name not in term_dictionary:
-        flash(f"ERROR: No term with the name {name} found in the dictionary!", category="error")
-        return None
-    
-    return term_dictionary[name]
+        if index >= len(subterms):
+            flash("ERROR: There are not enough subterms for index {index}!", category="error")
+            return
+        
+        term = subterms[index]
+        
+    return term
 
 
 def SaveTerm(term: List, input_str: str, name: str, replace_term: bool) -> None:
@@ -411,3 +309,23 @@ def SaveTerm(term: List, input_str: str, name: str, replace_term: bool) -> None:
         term_dictionary[name] = (input_str, term)
         
     session["terms"] = term_dictionary
+
+
+def LoadTerm(name: str) -> Optional[Tuple[str, List]]:
+    """
+    This function takes in the head of a tree and returns the contents within a list of lists.
+
+    Args:
+        name (str): the name by which to remember this term
+
+    Returns:
+        Optional[Tuple[str, List]]: returns a tuple with the string representation 
+        and the list of lists or None if there's an error
+    """
+    term_dictionary = session["terms"] if "terms" in session else {}
+    
+    if name not in term_dictionary:
+        flash(f"ERROR: No term with the name {name} found in the dictionary!", category="error")
+        return None
+    
+    return term_dictionary[name]

@@ -39,7 +39,7 @@
     
         <div class="col mt-2">
             <input class="btn btn-primary btn-lg"  type="submit" name="detect" value="Detect Language">
-            <input class="btn btn-primary btn-lg"  type="submit" name="save" value="Save Term">
+            <input class="btn btn-primary btn-lg"  type="submit" name="save" value="Save Term" {% if term_name in terms %}onclick="confirmAction()"{% endif %}>
         </div>
 
     </div>
@@ -51,4 +51,20 @@
 </form>
 
 </div>
+
+<script>
+    function confirmAction()
+    {
+        let confirmAction = confirm("This name is already used for a term!\nDo you want to overwrite it this term?");
+        if (confirmAction)
+        {
+            document.getElementById('form').submit();
+        }
+        else
+        {
+            event.preventDefault();
+        }
+    }
+</script>
+
 {% endblock %}

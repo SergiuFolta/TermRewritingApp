@@ -25,7 +25,7 @@ def home():
             return redirect(url_for('views.terms', functions = functions, variables = variables, terms = terms, tree = tree))
         
         if request.form.get('create'):
-            return redirect(url_for('views.createterm', term_name = term_name, term_string = term_string, functions = functions, variables = variables))
+            return redirect(url_for('views.createterm', term_name = term_name, term_string = term_string, functions = functions, variables = variables, terms = terms))
             
     return render_template("home.html")
 
@@ -120,11 +120,13 @@ def createterm():
         if request.form.get('save'):
             head = CreateTree(term_string)
             tree = ChangeTreeToList(head)
-            SaveTerm(tree, term_string, term_name, True)
+            SaveTerm(tree, term_string, term_name)
             
         if request.form.get('home'):
             return redirect(url_for('views.home'))
     
     functions = session["functions"] if "functions" in session else {}
     variables = session["variables"] if "variables" in session else set([])
-    return render_template("createterm.html", term_name = term_name, term_string = term_string, functions = functions, variables = variables)
+    term_dictionary = session["terms"] if "terms" in session else {}
+    terms = term_dictionary.keys()
+    return render_template("createterm.html", term_name = term_name, term_string = term_string, functions = functions, variables = variables, terms = terms)

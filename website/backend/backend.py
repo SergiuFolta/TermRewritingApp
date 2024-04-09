@@ -355,7 +355,7 @@ def LoadTerm(name: str) -> Optional[Tuple[str, List]]:
     return term_dictionary[name]
 
 
-def SaveTerm(term: List, input_str: str, name: str) -> None:
+def SaveTerm(term: List, input_str: str, name: str, replace_term: bool) -> None:
     """
     This function saves the current term to the user session for later use
     in the format (string_representation, list_representation)
@@ -364,9 +364,19 @@ def SaveTerm(term: List, input_str: str, name: str) -> None:
         term (List): list of lists representing a term
         input_str (str): stromg representation of the term
         name (str): the name by which to remember this term
+        replace_term (bool): if true, will replace the values if {name} already exists in dictionary
     """
     term_dictionary = session["terms"] if "terms" in session else {}
     
-    term_dictionary[name] = (input_str, term)
-    
+    if name in term_dictionary:
+        if replace_term == True:
+            term_dictionary[name] = (input_str, term)
+            flash("Successfully replaced term with name {name}!")
+            
+        else:
+            flash("ERROR: There already is a term with the name {name}! Tick the checkbox for replacing terms if this is what you want.", 
+                    category="error")
+    else:
+        term_dictionary[name] = (input_str, term)
+        
     session["terms"] = term_dictionary

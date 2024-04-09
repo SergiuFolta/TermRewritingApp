@@ -120,7 +120,7 @@ def createterm():
         if request.form.get('save'):
             head = CreateTree(term_string)
             tree = ChangeTreeToList(head)
-            SaveTerm(tree, term_string, term_name)
+            SaveTerm(tree, term_string, term_name, True)
             
         if request.form.get('home'):
             return redirect(url_for('views.home'))

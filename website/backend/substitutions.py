@@ -1,5 +1,6 @@
 from flask import session, flash
 from typing import List
+from .database import *
 
 def ModifySubstitution(old_substitution_input: str, old_substitution_output: str, 
                         new_substitution_input: str, new_substitution_output: str) -> None:
@@ -12,6 +13,11 @@ def ModifySubstitution(old_substitution_input: str, old_substitution_output: str
         new_substitution_input (str): the new left-hand side member of the substitution
         new_substitution_output (str): the new right-hand side member of the substitution
     """
+    old_substitution_input.replace(" ", "")
+    new_substitution_input.replace(" ", "")
+    old_substitution_output.replace(" ", "")
+    new_substitution_output.replace(" ", "")
+    
     if "substitutions" not in session:
         flash("ERROR: There are no substitutions loaded in the session.", category="error")
         return
@@ -49,6 +55,9 @@ def AddSubstitution(substitution_input: str, substitution_output: str, verbose: 
         substitution_output (str): the right-hand side member of the substitution
         verbose (bool): if True, will flash messages to website
     """
+    substitution_input.replace(" ", "")
+    substitution_output.replace(" ", "")
+    
     substitutions = LoadSubstitutions()
 
     if substitution_input in substitutions.keys():
@@ -76,6 +85,9 @@ def DeleteSubstitution(substitution_input: str, substitution_output: str, verbos
         substitution_output (str): the right-hand side member of the substitution
         verbose (bool): if True, will flash messages to website
     """
+    substitution_input.replace(" ", "")
+    substitution_output.replace(" ", "")
+    
     substitutions = LoadSubstitutions()
 
     if substitution_input not in substitutions.keys():
@@ -95,3 +107,29 @@ def DeleteSubstitution(substitution_input: str, substitution_output: str, verbos
     
     if verbose:
         flash(f"Successfully deleted the substitution going from {substitution_input} to {substitution_output}!")
+
+
+def RuleDeleteSubstitutions(substitutions: dict, verbose: bool = False) -> dict:
+    """
+    Unification problem - Delete rule implementation. This function will delete
+    all substitutions of the form {x -> x}.
+
+    Args:
+        substitutions (dict): the dictionary of substitutions
+
+    Returns:
+        dict: {substituions} after removing all entries satisfying the rule above
+    """
+    modified_substitutions = substitutions
+    for input in substitutions.keys():
+        for output in substitutions[input]:
+            if input == output:
+                if len(modified_substitutions[input]) == 1:
+                    modified_substitutions.pop(input)
+                else:
+                    modified_substitutions[input].remove(output)
+                    
+                if verbose:
+                    flash(f"Successfully removed substitution {input} to {output}!")
+    
+    return modified_substitutions

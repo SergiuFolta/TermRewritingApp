@@ -121,7 +121,13 @@ def createterm():
             head = CreateTree(term_string)
             tree = ChangeTreeToList(head)
             SaveTerm(tree, term_string, term_name)
-            
+            """
+            AddSubstitution("x", "x")
+            AddSubstitution("x", "f(a)")
+            AddSubstitution("g(x, x)", "g(x, y)")
+            print(LoadSubstitutions())
+            print(RuleDeleteSubstitutions(LoadSubstitutions()))
+            """
         if request.form.get('home'):
             return redirect(url_for('views.home'))
     

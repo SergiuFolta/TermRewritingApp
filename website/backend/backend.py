@@ -314,6 +314,42 @@ def ReplaceSubtermAtPosition(original_term: List, replacement_term: List, positi
     return original_term
 
 
+def IsTermGround(term: List) -> bool:
+    """
+    This function takes in a term and checks if it is ground (there are no variables).
+    
+    Args:
+        term (List): list representing a term
+
+    Returns:
+        bool: returns True if term is ground
+    """
+    variables = set(session["variables"]) if "variables" in session else set([])
+    
+    if len(variables) == 0:
+        return True # there are no variables in our language, so of course this is ground
+    
+    stack = [term]
+    while stack:
+        curr_term = stack.pop()
+        value = curr_term[0]
+        
+        if value in variables:
+            return False # found a variable, quit.
+        
+        if len(curr_term) > 1:
+            stack.append(curr_term[1]) # append the next children for checking in the stack
+        
+        for i in range(2, len(curr_term), 2):
+            if i + 1 != len(curr_term):
+                if type(curr_term[i + 1]) == list:
+                    stack.append([curr_term[i], curr_term[i + 1]]) # append the siblings and their children for checking in the stack
+            else:
+                stack.append([curr_term[i]])
+    
+    return True # passed all checks, this is ground
+
+
 def SaveTerm(term: List, input_str: str, name: str) -> None:
     """
     This function saves the current term to the user session for later use

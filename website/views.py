@@ -121,8 +121,6 @@ def createterm():
             head = CreateTree(term_string)
             tree = ChangeTreeToList(head)
             SaveTerm(tree, term_string, term_name)
-            print(GetSubtermAtPosition(tree, "1_1"))
-            print(ReplaceSubtermAtPosition(tree, ["f", ["x", "y"]], "1"))
             
         if request.form.get('home'):
             return redirect(url_for('views.home'))

@@ -35,13 +35,14 @@ def ModifyFunction(old_function_name: str, curr_function_name: str, function_ari
     flash(f"Successfully modified function {old_function_name} into function {curr_function_name} with arity {function_arity}!")
 
 
-def AddFunction(function_name: str, function_arity: int) -> None:
+def AddFunction(function_name: str, function_arity: int, verbose: bool = True) -> None:
     """
     This function adds an entry in the function dictionary.
 
     Args:
         function_name (str): name of the function to add (the key in the dictionary)
         function_arity (int): arity of the function (value of the key in the dictionary)
+        verbose (bool): if True, will flash messages to website
     """
     functions = LoadFunctions()
 
@@ -58,16 +59,18 @@ def AddFunction(function_name: str, function_arity: int) -> None:
     functions[function_name] = function_arity
     
     SaveFunctions(functions)
-
-    flash(f"Successfully added function {function_name} with arity {function_arity}!")
+    
+    if verbose:
+        flash(f"Successfully added function {function_name} with arity {function_arity}!")
     
     
-def DeleteFunction(function_name: str) -> None:
+def DeleteFunction(function_name: str, verbose: bool = True) -> None:
     """
     This function deletes an entry in the function dictionary.
 
     Args:
         function_name (str): name of the function to delete (the key in the dictionary)
+        verbose (bool): if True, will flash messages to website
     """
     functions = LoadFunctions()
 
@@ -78,8 +81,8 @@ def DeleteFunction(function_name: str) -> None:
     functions.pop(function_name)
     
     SaveFunctions(functions)
-    
-    flash(f"Successfully deleted function {function_name}!")
+    if verbose:
+        flash(f"Successfully deleted function {function_name}!")
     
 
 def SaveFunctions(functions: dict) -> None:

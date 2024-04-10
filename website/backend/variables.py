@@ -25,20 +25,21 @@ def ModifyVariable(old_variable_name: str, curr_variable_name: str) -> None:
             flash(f"ERROR: There is already a function with the name {curr_variable_name}!", category="error")
             return
         
-        variables.remove(old_variable_name)
-        variables.add(curr_variable_name)
+        DeleteVariable(old_variable_name, False)
+        AddVariable(curr_variable_name, False)
     
         SaveVariables(variables)
 
         flash(f"Successfully modified variable {old_variable_name} into variable {curr_variable_name}!")
 
 
-def AddVariable(variable_name: str) -> None:
+def AddVariable(variable_name: str, verbose: bool = True) -> None:
     """
     This function adds an entry in the variable set.
 
     Args:
         variable_name (str): name of the variable to add
+        verbose (bool): if True, will flash messages to website
     """
     variables = LoadVariables()
 
@@ -55,15 +56,17 @@ def AddVariable(variable_name: str) -> None:
     
     SaveVariables(variables)
 
-    flash(f"Successfully added variable {variable_name}!")
+    if verbose:
+        flash(f"Successfully added variable {variable_name}!")
     
     
-def DeleteVariable(variable_name: str) -> None:
+def DeleteVariable(variable_name: str, verbose: bool = True) -> None:
     """
     This function deletes an entry in the variables set.
 
     Args:
         variable_name (str): name of the variable to delete
+        verbose (bool): if True, will flash messages to website
     """
     variables = LoadVariables()
 
@@ -75,7 +78,8 @@ def DeleteVariable(variable_name: str) -> None:
     
     SaveVariables(variables)
     
-    flash(f"Successfully deleted function {variable_name}!")
+    if verbose:
+        flash(f"Successfully deleted function {variable_name}!")
     
 
 def SaveVariables(variables: set) -> None:

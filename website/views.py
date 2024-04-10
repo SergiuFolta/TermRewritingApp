@@ -6,8 +6,8 @@ views = Blueprint('views', __name__)
 
 @views.route('/', methods=['GET', 'POST'])
 def home():
-    functions = session["functions"] if "functions" in session else {}
-    variables = session["variables"] if "variables" in session else set([])
+    functions = LoadFunctions()
+    variables = LoadVariables()
     term_name = session["term_name"] if "term_name" in session else ""
     term_string = session["term_string"] if "term_string" in session else ""
     term_dictionary = session["terms"] if "terms" in session else {}
@@ -31,7 +31,7 @@ def home():
 
 @views.route('/functions', methods=['GET', 'POST'])
 def functions():
-    functions = session["functions"] if "functions" in session else {}
+    functions = LoadFunctions()
     
     if request.method == 'POST':
         if request.form.get('addnew'):
@@ -48,7 +48,7 @@ def functions():
                 ModifyFunction(f, function_name, function_arity)  
                 break
             
-            if  request.form.get('delete' + str(i + 1)):
+            if request.form.get('delete' + str(i + 1)):
                 DeleteFunction(f)
                 break
         
@@ -59,7 +59,7 @@ def functions():
 
 @views.route('/variables', methods=['GET', 'POST'])
 def variables():
-    variables = set(session["variables"]) if "variables" in session else set([])
+    variables = LoadVariables()
     
     if request.method == 'POST':
         if request.form.get('home'):
@@ -79,14 +79,14 @@ def variables():
                 DeleteVariable(v)
                 break
             
-        variables = set(session["variables"])
+        SaveVariables(variables)
     
     return render_template("variables.html", variables = variables)
 
 @views.route('/terms', methods=['GET', 'POST'])
 def terms():
-    functions = session["functions"] if "functions" in session else {}
-    variables = session["variables"] if "variables" in session else set([])
+    functions = LoadFunctions()
+    variables = LoadVariables()
     term_dictionary = session["terms"] if "terms" in session else {}
     terms = term_dictionary.keys()
     tree = ""
@@ -125,8 +125,8 @@ def createterm():
         if request.form.get('home'):
             return redirect(url_for('views.home'))
     
-    functions = session["functions"] if "functions" in session else {}
-    variables = session["variables"] if "variables" in session else set([])
+    functions = LoadFunctions()
+    variables = LoadVariables()
     term_dictionary = session["terms"] if "terms" in session else {}
     terms = term_dictionary.keys()
     return render_template("createterm.html", term_name = term_name, term_string = term_string, functions = functions, variables = variables, terms = terms)

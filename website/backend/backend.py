@@ -4,6 +4,7 @@ from .variables import *
 from .functions import *
 from .node import Node
 from .representation_changes import ChangeListToTree, ChangeTreeToList
+from .substitutions import *
 
 
 def CountArguments(function_str: str) -> int:
@@ -42,8 +43,8 @@ def LoadLanguage(input_str: str) -> None:
     Args:
         input_str (str): term to load the language from
     """
-    functions = session["functions"] if "functions" in session else {}
-    variables = set(session["variables"]) if "variables" in session else set([]) # sets aren't JSON serializable
+    functions = LoadFunctions()
+    variables = LoadVariables()
     
     i = 0
     while i < len(input_str):
@@ -116,8 +117,8 @@ def LoadLanguage(input_str: str) -> None:
         
         i += 1
     
-    session["functions"] = functions
-    session["variables"] = list(variables) # sets aren't JSON serializable
+    SaveFunctions(functions)
+    SaveVariables(variables)
 
 
 def CreateTree(input_str: str) -> Optional[Node] :
@@ -131,8 +132,8 @@ def CreateTree(input_str: str) -> Optional[Node] :
         Optional[Node]: returns the head of the tree or None if it can't be created
     """
     
-    functions = session["functions"] if "functions" in session else {}
-    variables = set(session["variables"]) if "variables" in session else set([]) # sets aren't JSON serializable
+    functions = LoadFunctions()
+    variables = LoadVariables()
     
     head = Node()
     current_node = head
@@ -324,7 +325,7 @@ def IsTermGround(term: List) -> bool:
     Returns:
         bool: returns True if term is ground
     """
-    variables = set(session["variables"]) if "variables" in session else set([])
+    variables = LoadVariables()
     
     if len(variables) == 0:
         return True # there are no variables in our language, so of course this is ground

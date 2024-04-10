@@ -1,4 +1,5 @@
 from flask import session, flash
+from .variables import LoadVariables
 
 def ModifyFunction(old_function_name: str, curr_function_name: str, function_arity: int) -> None:
     """
@@ -13,8 +14,8 @@ def ModifyFunction(old_function_name: str, curr_function_name: str, function_ari
         flash("ERROR: There are no functions loaded in the session.", category="error")
         return
     
-    functions = session["functions"]
-    variables = session["variables"] if "variables" in session else set([])
+    functions = LoadFunctions()
+    variables = LoadVariables()
     
     if old_function_name not in functions:
         flash(f"ERROR: Could not find function {old_function_name} in dictionary!", category="error")
@@ -29,7 +30,7 @@ def ModifyFunction(old_function_name: str, curr_function_name: str, function_ari
     
     functions[curr_function_name] = function_arity # modify the function arity
     
-    session["functions"] = functions
+    SaveFunctions(functions)
 
     flash(f"Successfully modified function {old_function_name} into function {curr_function_name} with arity {function_arity}!")
 
@@ -42,13 +43,13 @@ def AddFunction(function_name: str, function_arity: int) -> None:
         function_name (str): name of the function to add (the key in the dictionary)
         function_arity (int): arity of the function (value of the key in the dictionary)
     """
-    functions = session["functions"] if "functions" in session else {}
+    functions = LoadFunctions()
 
     if function_name in functions:
         flash(f"ERROR: There is already a function with the name {function_name} in our dictionary!", category="error")
         return
     
-    variables = session["variables"] if "variables" in session else set([])
+    variables = LoadVariables()
     
     if function_name in variables:
         flash(f"ERROR: There is already a variable with the name {function_name}!", category="error")
@@ -56,7 +57,7 @@ def AddFunction(function_name: str, function_arity: int) -> None:
 
     functions[function_name] = function_arity
     
-    session["functions"] = functions
+    SaveFunctions(functions)
 
     flash(f"Successfully added function {function_name} with arity {function_arity}!")
     
@@ -68,7 +69,7 @@ def DeleteFunction(function_name: str) -> None:
     Args:
         function_name (str): name of the function to delete (the key in the dictionary)
     """
-    functions = session["functions"] if "functions" in session else {}
+    functions = LoadFunctions()
 
     if function_name not in functions:
         flash(f"ERROR: There is no function with the name {function_name} in our dictionary!", category="error")
@@ -76,6 +77,27 @@ def DeleteFunction(function_name: str) -> None:
 
     functions.pop(function_name)
     
-    session["functions"] = functions
+    SaveFunctions(functions)
     
     flash(f"Successfully deleted function {function_name}!")
+    
+
+def SaveFunctions(functions: dict) -> None:
+    """
+    This function saves the {functions} dictionary in the current user session.
+
+    Args:
+        functions (dict): dictionary which includes the functions in our language and their arity
+    """
+    session["functions"] = functions
+    
+
+def LoadFunctions() -> dict:
+    """
+    This function loads the {functions} dictionary from the current user session, 
+    or creates a new dictionary if it doesn't exist.
+
+    Returns:
+        dict: the dictionary containing the functions in our language and their arity
+    """
+    return session["functions"] if "functions" in session else {}

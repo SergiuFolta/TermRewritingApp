@@ -252,9 +252,9 @@ def GetSubtermAtPosition(term: List, position: str = "") -> List:
     that position onward.
 
     Args:
+        term (List): list representing a term
         position (str): position of the subterm you'd like to get (in format "{number}_{number}_{number}").
                         If you want to get the root, position is = ""
-        term (List): list representing a term
 
     Returns:
         List: returns the list of lists or [] if there's an error
@@ -267,21 +267,51 @@ def GetSubtermAtPosition(term: List, position: str = "") -> List:
     for index in indeces:
         term = term[1]
         index = int(index) - 1
-        
-        subterms = []
-        for item in term:
-            if type(item) == list:
-                subterms[-1].append(item)
-            else:
-                subterms.append([item])
-        
-        if index >= len(subterms):
+
+        if index + 1 >= len(term):
             flash("ERROR: There are not enough subterms for index {index}!", category="error")
             return
         
-        term = subterms[index]
+        term = term[index : index + 2]
         
     return term
+
+
+def ReplaceSubtermAtPosition(original_term: List, replacement_term: List, position: str = "") -> List:
+    """
+    This function takes in a position from {original_term} and returns a new term created from replacing
+    everything from {position} in {original_term} with {replacement_term}.
+    This function does NOT modify {original_term} outside of its scope.
+    
+    Args:
+        original_term (List): list representing a term which will be built on top of
+        replacement_term (List): list representing a term which will replace a subterm from {original_term}
+        position (str): position of the subterm you'd like to get (in format "{number}_{number}_{number}").
+                        If you want to get the root, position is = ""
+
+    Returns:
+        List: returns the new term after replacement
+    """
+    if position == "":
+        return original_term
+    
+    indeces = position.split("_")
+    term = original_term
+    for index in indeces:
+        term = term[1]
+        index = int(index) - 1
+        
+        if index + 1 >= len(term):
+            flash("ERROR: There are not enough subterms for index {index}!", category="error")
+            return
+        
+        term[0] = term[index] # using term[index : index + 2] seems to only copy by value, not by reference.
+        term[1] = term[index + 1] # for once, doing this in C++/Java would've been easier.
+        
+    term[0] = replacement_term[0] # same thing here. term = replacement_term would copy things by value.
+    term[1] = replacement_term[1] # meaning original_term would not be modified.
+    
+    return original_term
 
 
 def SaveTerm(term: List, input_str: str, name: str) -> None:

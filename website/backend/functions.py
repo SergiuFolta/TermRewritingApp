@@ -1,5 +1,5 @@
 from flask import session, flash
-from .variables import LoadVariables
+from .database import *
 
 def ModifyFunction(old_function_name: str, curr_function_name: str, function_arity: int) -> None:
     """
@@ -59,7 +59,7 @@ def AddFunction(function_name: str, function_arity: int, verbose: bool = True) -
     functions[function_name] = function_arity
     
     SaveFunctions(functions)
-    
+
     if verbose:
         flash(f"Successfully added function {function_name} with arity {function_arity}!")
     
@@ -83,24 +83,3 @@ def DeleteFunction(function_name: str, verbose: bool = True) -> None:
     SaveFunctions(functions)
     if verbose:
         flash(f"Successfully deleted function {function_name}!")
-    
-
-def SaveFunctions(functions: dict) -> None:
-    """
-    This function saves the {functions} dictionary in the current user session.
-
-    Args:
-        functions (dict): dictionary which includes the functions in our language and their arity
-    """
-    session["functions"] = functions
-    
-
-def LoadFunctions() -> dict:
-    """
-    This function loads the {functions} dictionary from the current user session, 
-    or creates a new dictionary if it doesn't exist.
-
-    Returns:
-        dict: the dictionary containing the functions in our language and their arity
-    """
-    return session["functions"] if "functions" in session else {}

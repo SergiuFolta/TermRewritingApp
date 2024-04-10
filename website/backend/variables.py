@@ -1,5 +1,5 @@
 from flask import session, flash
-from .functions import LoadFunctions
+from .database import *
 
 def ModifyVariable(old_variable_name: str, curr_variable_name: str) -> None:
     """
@@ -80,24 +80,3 @@ def DeleteVariable(variable_name: str, verbose: bool = True) -> None:
     
     if verbose:
         flash(f"Successfully deleted function {variable_name}!")
-    
-
-def SaveVariables(variables: set) -> None:
-    """
-    This function saves the {variables} set in the current user session.
-
-    Args:
-        variables (set): set which includes the variables in our language
-    """
-    session["variables"] = list(variables) # sets aren't JSON serializable
-    
-
-def LoadVariables() -> set:
-    """
-    This function loads the {variables} set from the current user session, 
-    or creates a new set if it doesn't exist.
-
-    Returns:
-        set: the set containing the variables in our language
-    """
-    return set(session["variables"]) if "variables" in session else set([]) # sets aren't JSON serializable

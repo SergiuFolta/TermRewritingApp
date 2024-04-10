@@ -1,10 +1,11 @@
-from typing import Optional, List, Tuple
-from flask import session, flash
+from typing import Optional, List
+from flask import flash
 from .variables import *
 from .functions import *
 from .node import Node
 from .representation_changes import ChangeListToTree, ChangeTreeToList
 from .substitutions import *
+from .database import *
 
 
 def CountArguments(function_str: str) -> int:
@@ -349,40 +350,3 @@ def IsTermGround(term: List) -> bool:
                 stack.append([curr_term[i]])
     
     return True # passed all checks, this is ground
-
-
-def SaveTerm(term: List, input_str: str, name: str) -> None:
-    """
-    This function saves the current term to the user session for later use
-    in the format (string_representation, list_representation)
-
-    Args:
-        term (List): list of lists representing a term
-        input_str (str): stromg representation of the term
-        name (str): the name by which to remember this term
-    """
-    term_dictionary = session["terms"] if "terms" in session else {}
-    
-    term_dictionary[name] = (input_str, term)
-        
-    session["terms"] = term_dictionary
-
-
-def LoadTerm(name: str) -> Optional[Tuple[str, List]]:
-    """
-    This function takes in the head of a tree and returns the contents within a list of lists.
-
-    Args:
-        name (str): the name by which to remember this term
-
-    Returns:
-        Optional[Tuple[str, List]]: returns a tuple with the string representation 
-        and the list of lists or None if there's an error
-    """
-    term_dictionary = session["terms"] if "terms" in session else {}
-    
-    if name not in term_dictionary:
-        flash(f"ERROR: No term with the name {name} found in the dictionary!", category="error")
-        return None
-    
-    return term_dictionary[name]

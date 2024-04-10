@@ -33,7 +33,7 @@ def ModifySubstitution(old_substitution_input: str, old_substitution_output: str
         DeleteSubstitution(old_substitution_input, old_substitution_output, False)
         AddSubstitution(old_substitution_input, new_substitution_output, False)
 
-    flash(f"Successfully modified substitution {old_substitution_input} to {old_substitution_output}
+    flash(f"Successfully modified substitution {old_substitution_input} to {old_substitution_output} \
             into {new_substitution_input} to {new_substitution_output}!")
 
 
@@ -95,24 +95,3 @@ def DeleteSubstitution(substitution_input: str, substitution_output: str, verbos
     
     if verbose:
         flash(f"Successfully deleted the substitution going from {substitution_input} to {substitution_output}!")
-
-
-def SaveSubstitutions(substitutions: dict) -> None:
-    """
-    This function saves the {substitutions} dictionary in the current user session.
-
-    Args:
-        substitutions (dict): dictionary which includes the substitutions
-    """
-    session["substitutions"] = substitutions
-    
-
-def LoadSubstitutions() -> dict:
-    """
-    This function loads the {substitutions} dictionary from the current user session, 
-    or creates a new dictionary if it doesn't exist.
-
-    Returns:
-        dict: the dictionary containing the substitutions
-    """
-    return session["substitutions"] if "substitutions" in session else {}

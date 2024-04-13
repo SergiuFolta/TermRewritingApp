@@ -8,6 +8,7 @@ views = Blueprint('views', __name__)
 def home():
     functions = LoadFunctions()
     variables = LoadVariables()
+    substitutions = LoadSubstitutions()
     term_name = session["term_name"] if "term_name" in session else ""
     term_string = session["term_string"] if "term_string" in session else ""
     term_dictionary = session["terms"] if "terms" in session else {}
@@ -26,6 +27,9 @@ def home():
         
         if request.form.get('create'):
             return redirect(url_for('views.createterm', term_name = term_name, term_string = term_string, functions = functions, variables = variables, terms = terms))
+        
+        if request.form.get('substitutions'):
+            return redirect(url_for('views.substitutions', substitutions = substitutions))
             
     return render_template("home.html")
 
@@ -97,6 +101,16 @@ def terms():
             tree = LoadTerm(term_name)
             if tree is not None:
                 tree = tree[1]
+                
+        if request.form.get('ground'):
+            term_name = request.form.get('term')
+            tree = LoadTerm(term_name)
+            if tree is not None:
+                tree = tree[1]
+            if tree and IsTermGround(tree):
+                flash("The term is ground!")
+            elif tree:
+                flash("The term is not ground!", category="error")
         
         if request.form.get('home'):
             return redirect(url_for('views.home'))
@@ -121,13 +135,6 @@ def createterm():
             head = CreateTree(term_string)
             tree = ChangeTreeToList(head)
             SaveTerm(tree, term_string, term_name)
-            """
-            AddSubstitution("x", "x")
-            AddSubstitution("x", "f(a)")
-            AddSubstitution("g(x, x)", "g(x, y)")
-            print(LoadSubstitutions())
-            print(RuleDeleteSubstitutions(LoadSubstitutions()))
-            """
         if request.form.get('home'):
             return redirect(url_for('views.home'))
     
@@ -136,3 +143,41 @@ def createterm():
     term_dictionary = session["terms"] if "terms" in session else {}
     terms = term_dictionary.keys()
     return render_template("createterm.html", term_name = term_name, term_string = term_string, functions = functions, variables = variables, terms = terms)
+
+@views.route('/substitutions', methods=['GET', 'POST'])
+def substitutions():
+    substitutions = LoadSubstitutions()
+    
+    if request.method == 'POST':
+        if request.form.get('home'):
+            return redirect(url_for('views.home'))
+        
+        if request.form.get('addnew'):
+            sub_in = request.form.get('subinnew')
+            sub_out = request.form.get('suboutnew')
+            AddSubstitution(sub_in, sub_out)
+          
+        i = 0 
+        k = 0   
+        for sub in substitutions.keys():
+            for subs in substitutions[sub]:  
+                if request.form.get('modify' + str(i + 1)):
+                    sub_in = request.form.get('subin' + str(i + 1))
+                    sub_out = request.form.get('subout' + str(i + 1))
+                    ModifySubstitution(sub, subs, sub_in, sub_out)
+                    k = 1
+                    break
+                
+                if  request.form.get('delete' + str(i + 1)):
+                    DeleteSubstitution(sub, subs)
+                    k = 1
+                    break
+                
+                i = i + 1
+                
+            if k:
+                break
+                
+        SaveSubstitutions(substitutions)
+    
+    return render_template("substitutions.html", substitutions = substitutions)

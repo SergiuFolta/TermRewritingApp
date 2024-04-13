@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Substitutions{% endblock %}
+
+{% block content %}
+<div class="text-center">
+    
+<form method="POST" enctype="multipart/form-data">
+
+    <div class="h1 mt-5">
+        <b>Substitutions</b>
+    </div>
+
+    <div class="d-grid col-7 mx-auto mt-5">
+            
+        {% set count = namespace(value=1) %}
+        {% for sub_in, list in substitutions.items() %}
+            {% for sub_out in list %}
+            <div class="col mt-2">
+                
+                <input class="form-control-md" type="text" value="{{sub_in}}" name="subin{{count.value}}">
+                <input class="form-control-md" type="text" value="{{sub_out}}" name="subout{{count.value}}">
+                <input class="btn btn-primary btn-md"  type="submit" name="modify{{loop.index}}" value="Modify Substitution">
+                <input class="btn btn-primary btn-md"  type="submit" name="delete{{loop.index}}" value="Delete Substitution">
+                {% set count.value = count.value + 1 %}
+
+            </div>
+            {% endfor %}
+        {% endfor %}
+
+        <div class="h2 mt-2">
+            <b>Add a New Substitutions</b>
+        </div>
+
+        <div class="col mt-2">
+            
+            <input class="form-control-md" type="text" placeholder="Substitution Input" name="subinnew">
+            <input class="form-control-md" type="text" placeholder="Substitution Output" name="suboutnew">
+            <input class="btn btn-primary btn-md"  type="submit" name="addnew" value="Add Substitution">
+
+        </div>
+
+    </div>
+
+    <div class="col mt-2">
+        <input class="btn btn-primary btn-lg"  type="submit" name="home" value="Home Page">
+    </div>
+
+</form>
+
+</div>
+{% endblock %}

@@ -43,13 +43,14 @@ def functions():
             function_arity = int(request.form.get('aritynew'))
             AddFunction(function_name, function_arity)
             
-            functions = dict(sorted(session["functions"].items()))
+            functions = dict(sorted(LoadFunctions().items()))
             
         for i,f in enumerate(functions.keys()):
             if request.form.get('modify' + str(i + 1)):
                 function_name = request.form.get('function' + str(i + 1))
                 function_arity = int(request.form.get('arity' + str(i + 1)))
                 ModifyFunction(f, function_name, function_arity)  
+                functions = dict(sorted(LoadFunctions().items()))
                 break
             
             if request.form.get('delete' + str(i + 1)):
@@ -156,7 +157,9 @@ def substitutions():
             sub_in = request.form.get('subinnew')
             sub_out = request.form.get('suboutnew')
             AddSubstitution(sub_in, sub_out)
-          
+            
+            substitutions = dict(sorted(LoadSubstitutions().items()))
+        
         i = 0 
         k = 0   
         for sub in substitutions.keys():
@@ -165,10 +168,12 @@ def substitutions():
                     sub_in = request.form.get('subin' + str(i + 1))
                     sub_out = request.form.get('subout' + str(i + 1))
                     ModifySubstitution(sub, subs, sub_in, sub_out)
+                    substitutions = dict(sorted(LoadSubstitutions().items()))
                     k = 1
                     break
                 
                 if  request.form.get('delete' + str(i + 1)):
+                    print(i)
                     DeleteSubstitution(sub, subs)
                     k = 1
                     break
@@ -177,7 +182,5 @@ def substitutions():
                 
             if k:
                 break
-                
-        SaveSubstitutions(substitutions)
     
     return render_template("substitutions.html", substitutions = substitutions)

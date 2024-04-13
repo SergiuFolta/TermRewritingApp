@@ -20,8 +20,8 @@
                 
                 <input class="form-control-md" type="text" value="{{sub_in}}" name="subin{{count.value}}">
                 <input class="form-control-md" type="text" value="{{sub_out}}" name="subout{{count.value}}">
-                <input class="btn btn-primary btn-md"  type="submit" name="modify{{loop.index}}" value="Modify Substitution">
-                <input class="btn btn-primary btn-md"  type="submit" name="delete{{loop.index}}" value="Delete Substitution">
+                <input class="btn btn-primary btn-md"  type="submit" name="modify{{count.value}}" value="Modify Substitution">
+                <input class="btn btn-primary btn-md"  type="submit" name="delete{{count.value}}" value="Delete Substitution">
                 {% set count.value = count.value + 1 %}
 
             </div>

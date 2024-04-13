@@ -13,10 +13,10 @@ def ModifySubstitution(old_substitution_input: str, old_substitution_output: str
         new_substitution_input (str): the new left-hand side member of the substitution
         new_substitution_output (str): the new right-hand side member of the substitution
     """
-    old_substitution_input.replace(" ", "")
-    new_substitution_input.replace(" ", "")
-    old_substitution_output.replace(" ", "")
-    new_substitution_output.replace(" ", "")
+    old_substitution_input = old_substitution_input.replace(" ", "")
+    new_substitution_input = new_substitution_input.replace(" ", "")
+    old_substitution_output = old_substitution_output.replace(" ", "")
+    new_substitution_output = new_substitution_output.replace(" ", "")
     
     if "substitutions" not in session:
         flash("ERROR: There are no substitutions loaded in the session.", category="error")
@@ -55,8 +55,8 @@ def AddSubstitution(substitution_input: str, substitution_output: str, verbose: 
         substitution_output (str): the right-hand side member of the substitution
         verbose (bool): if True, will flash messages to website
     """
-    substitution_input.replace(" ", "")
-    substitution_output.replace(" ", "")
+    substitution_input = substitution_input.replace(" ", "")
+    substitution_output = substitution_output.replace(" ", "")
     
     substitutions = LoadSubstitutions()
 
@@ -85,8 +85,8 @@ def DeleteSubstitution(substitution_input: str, substitution_output: str, verbos
         substitution_output (str): the right-hand side member of the substitution
         verbose (bool): if True, will flash messages to website
     """
-    substitution_input.replace(" ", "")
-    substitution_output.replace(" ", "")
+    substitution_input = substitution_input.replace(" ", "")
+    substitution_output = substitution_output.replace(" ", "")
     
     substitutions = LoadSubstitutions()
 

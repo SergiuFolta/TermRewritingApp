@@ -196,6 +196,8 @@ def replace():
             
             replace_index = request.form.get('replace_index')
             
+            tree3 = LoadTerm(term_name1)
+            
             #Create the new term
             
     return render_template("replace.html", terms = terms, term_selected1 = term_selected1, term_selected2 = term_selected2, tree1 = tree1, tree2 = tree2, tree3 = tree3)

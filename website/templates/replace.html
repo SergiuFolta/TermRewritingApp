@@ -86,25 +86,29 @@
 
         {% endif %}
 
-    </div>
-
-    <div class="col mt-2">
-        <input class="btn btn-primary btn-lg mt-2"  type="submit" name="replace" value="Replace">
-    </div>
-
-    {% if tree3 %}
-
-        <div class="col text-start mt-2">
-            {% set radio = namespace(value=0) %}
-            {% set count = namespace(value=0) %}
-            <ul class="tree">
-            {{ PrintTree(tree3) }}
-            </ul>
+        <div class="col mt-2">
+            <input class="btn btn-primary btn-lg mt-2"  type="submit" name="replace" value="Replace">
         </div>
     
-    {% endif %}
+        {% if tree3 %}
 
-    <div class="col mt-2">
+            <div class="col mt-2">
+                <b>Tree Representation</b>
+            </div>
+    
+            <div class="col text-start mt-2">
+                {% set radio = namespace(value=0) %}
+                {% set count = namespace(value=0) %}
+                <ul class="tree">
+                {{ PrintTree(tree3) }}
+                </ul>
+            </div>
+        
+        {% endif %}
+
+    </div>
+
+    <div class="col mt-5">
         <input class="btn btn-primary btn-lg"  type="submit" name="home" value="Home Page">
     </div>
 

@@ -50,6 +50,9 @@ def functions():
     functions = LoadFunctions()
     
     if request.method == 'POST':
+        if request.form.get('home'):
+            return redirect(url_for('views.home'))
+        
         if request.form.get('addnew'):
             function_name = request.form.get('functionnew')
             function_arity = int(request.form.get('aritynew'))
@@ -68,9 +71,6 @@ def functions():
             if request.form.get('delete' + str(i + 1)):
                 DeleteFunction(f)
                 break
-        
-        if request.form.get('home'):
-            return redirect(url_for('views.home'))
     
     return render_template("functions.html", functions = functions)
 
@@ -110,6 +110,9 @@ def terms():
     term_selected = ""
     
     if request.method == 'POST':    
+        if request.form.get('home'):
+            return redirect(url_for('views.home'))
+        
         if request.form.get('display'):
             term_name = request.form.get('term')
             term_selected = term_name
@@ -127,9 +130,6 @@ def terms():
                 flash("The term \'" + term_name + "\' is ground!")
             elif tree:
                 flash("The term \'" + term_name + "\' is not ground!", category="error")
-        
-        if request.form.get('home'):
-            return redirect(url_for('views.home'))
             
     return render_template("terms.html", functions = functions, variables = variables, terms = terms, term_selected = term_selected, tree = tree)
 
@@ -139,6 +139,9 @@ def createterm():
     term_string = session["term_string"] if "term_string" in session else ""
     
     if request.method == 'POST':
+        if request.form.get('home'):
+            return redirect(url_for('views.home'))
+        
         term_name = request.form.get('name')
         term_string = request.form.get('string')
         session["term_name"] = term_name
@@ -151,8 +154,6 @@ def createterm():
             head = CreateTree(term_string)
             tree = ChangeTreeToList(head)
             SaveTerm(tree, term_string, term_name)
-        if request.form.get('home'):
-            return redirect(url_for('views.home'))
     
     functions = LoadFunctions()
     variables = LoadVariables()
@@ -195,8 +196,6 @@ def replace():
             term_selected2 = term_name2
             
             replace_index = request.form.get('replace_index')
-            
-            tree3 = LoadTerm(term_name1)
             
             #Create the new term
             

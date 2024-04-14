@@ -11,7 +11,7 @@
         <b>Terms</b>
     </div>
 
-    <div class="d-grid col-4 mx-auto mt-5">
+    <div class="d-grid col-3 mx-auto mt-5">
 
         <div class="col">
             <label class="form-label"><b>Functions: </b></label>
@@ -32,7 +32,7 @@
         <div class="col mt-2">
             <select class="form-select" name="term">
                 {% for term in terms %}
-                <option value="{{ term }}">{{ term }}</option>
+                <option value="{{ term }}" {% if term == term_selected %}selected{% endif %}>{{ term }}</option>
                 {% endfor %}
             </select>
             <input class="btn btn-primary btn-lg mt-2"  type="submit" name="display" value="Display Tree">

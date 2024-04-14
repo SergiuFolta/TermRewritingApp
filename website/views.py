@@ -14,6 +14,12 @@ def home():
     term_dictionary = session["terms"] if "terms" in session else {}
     terms = term_dictionary.keys()
     tree = ""
+    term_selected = ""
+    tree1 = ""
+    term_selected1 = ""
+    tree2 = ""
+    term_selected2 = ""
+    tree3 = ""
     
     if request.method == 'POST':  
         if request.form.get('functions'):
@@ -23,13 +29,19 @@ def home():
             return redirect(url_for('views.variables', variables = variables))
         
         if request.form.get('terms'):
-            return redirect(url_for('views.terms', functions = functions, variables = variables, terms = terms, tree = tree))
+            return redirect(url_for('views.terms', functions = functions, variables = variables, terms = terms, term_selected = term_selected, tree = tree))
         
         if request.form.get('create'):
             return redirect(url_for('views.createterm', term_name = term_name, term_string = term_string, functions = functions, variables = variables, terms = terms))
         
+        if request.form.get('replace'):
+            return redirect(url_for("views.replace", terms = terms, term_selected1 = term_selected1, term_selected2 = term_selected2, tree1 = tree1, tree2 = tree2, tree3 = tree3))
+        
         if request.form.get('substitutions'):
             return redirect(url_for('views.substitutions', substitutions = substitutions))
+        
+        if request.form.get('unification'):
+            return redirect(url_for('views.unification', substitutions = substitutions))
             
     return render_template("home.html")
 
@@ -95,28 +107,31 @@ def terms():
     term_dictionary = session["terms"] if "terms" in session else {}
     terms = term_dictionary.keys()
     tree = ""
+    term_selected = ""
     
     if request.method == 'POST':    
         if request.form.get('display'):
             term_name = request.form.get('term')
+            term_selected = term_name
             tree = LoadTerm(term_name)
             if tree is not None:
                 tree = tree[1]
                 
         if request.form.get('ground'):
             term_name = request.form.get('term')
+            term_selected = term_name
             tree = LoadTerm(term_name)
             if tree is not None:
                 tree = tree[1]
             if tree and IsTermGround(tree):
-                flash("The term is ground!")
+                flash("The term \'" + term_name + "\' is ground!")
             elif tree:
-                flash("The term is not ground!", category="error")
+                flash("The term \'" + term_name + "\' is not ground!", category="error")
         
         if request.form.get('home'):
             return redirect(url_for('views.home'))
             
-    return render_template("terms.html", functions = functions, variables = variables, terms = terms, tree = tree)
+    return render_template("terms.html", functions = functions, variables = variables, terms = terms, term_selected = term_selected, tree = tree)
 
 @views.route('/createterm', methods=['GET', 'POST'])
 def createterm():
@@ -144,6 +159,46 @@ def createterm():
     term_dictionary = session["terms"] if "terms" in session else {}
     terms = term_dictionary.keys()
     return render_template("createterm.html", term_name = term_name, term_string = term_string, functions = functions, variables = variables, terms = terms)
+
+@views.route('/replace', methods=['GET', 'POST'])
+def replace():
+    term_dictionary = session["terms"] if "terms" in session else {}
+    terms = term_dictionary.keys()
+    tree1 = ""
+    term_selected1 = ""
+    tree2 = ""
+    term_selected2 = ""
+    tree3 = ""
+    
+    if request.method == 'POST': 
+        if request.form.get('home'):
+            return redirect(url_for('views.home'))
+           
+        if request.form.get('display'):
+            term_name1 = request.form.get('term1')
+            term_selected1 = term_name1
+            tree1 = LoadTerm(term_name1)
+            if tree1 is not None:
+                tree1 = tree1[1]
+            
+            term_name2 = request.form.get('term2')
+            term_selected2 = term_name2
+            tree2 = LoadTerm(term_name2)
+            if tree2 is not None:
+                tree2 = tree2[1]
+                
+        if request.form.get('replace'):
+            term_name1 = request.form.get('term1')
+            term_selected1 = term_name1
+            
+            term_name2 = request.form.get('term2')
+            term_selected2 = term_name2
+            
+            replace_index = request.form.get('replace_index')
+            
+            #Create the new term
+            
+    return render_template("replace.html", terms = terms, term_selected1 = term_selected1, term_selected2 = term_selected2, tree1 = tree1, tree2 = tree2, tree3 = tree3)
 
 @views.route('/substitutions', methods=['GET', 'POST'])
 def substitutions():
@@ -184,3 +239,19 @@ def substitutions():
                 break
     
     return render_template("substitutions.html", substitutions = substitutions)
+
+@views.route('/unification', methods=['GET', 'POST'])
+def unification():
+    substitutions = LoadSubstitutions()
+    old_substitutions = {}
+    
+    if request.method == 'POST':
+        if request.form.get('home'):
+            return redirect(url_for('views.home'))
+        
+        if request.form.get('unify'):
+            old_substitutions = substitutions
+            
+            #Unify
+    
+    return render_template("unification.html", substitutions = substitutions, old_substitutions = old_substitutions)

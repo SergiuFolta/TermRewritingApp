@@ -11,32 +11,30 @@
         <b>Functions</b>
     </div>
 
-    <div class="d-grid col-7 mx-auto mt-5">
-            
-        {% for function,arity in functions.items() %}
+    <div class="h2 mt-3">&nbsp;</div>
+      
+    {% for function,arity in functions.items() %}
 
-        <div class="col mt-2">
-            
-            <input class="form-control-md" type="text" value="{{function}}" name="function{{loop.index}}">
-            <input class="form-control-md" type="number" min="0" value="{{arity}}" name="arity{{loop.index}}">
-            <input class="btn btn-primary btn-md"  type="submit" name="modify{{loop.index}}" value="Modify Function">
-            <input class="btn btn-primary btn-md"  type="submit" name="delete{{loop.index}}" value="Delete Function">
+    <div class="col mt-2">
+        
+        <input class="form-control-md" type="text" value="{{function}}" name="function{{loop.index}}">
+        <input class="form-control-md" type="number" min="0" value="{{arity}}" name="arity{{loop.index}}">
+        <input class="btn btn-primary btn-md"  type="submit" name="modify{{loop.index}}" value="Modify Function">
+        <input class="btn btn-primary btn-md"  type="submit" name="delete{{loop.index}}" value="Delete Function">
 
-        </div>
-            
-        {% endfor %}
+    </div>
+        
+    {% endfor %}
 
-        <div class="h2 mt-2">
-            <b>Add a New Function</b>
-        </div>
+    <div class="h2 mt-2">
+        <b>Add a New Function</b>
+    </div>
 
-        <div class="col mt-2">
-            
-            <input class="form-control-md" type="text" placeholder="Function Name" name="functionnew">
-            <input class="form-control-md" type="number" min="0" placeholder="Arity" name="aritynew">
-            <input class="btn btn-primary btn-md"  type="submit" name="addnew" value="Add Function">
-
-        </div>
+    <div class="col mt-2">
+        
+        <input class="form-control-md" type="text" placeholder="Function Name" name="functionnew">
+        <input class="form-control-md" type="number" min="0" placeholder="Arity" name="aritynew">
+        <input class="btn btn-primary btn-md"  type="submit" name="addnew" value="Add Function">
 
     </div>
 

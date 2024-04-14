@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Replace{% endblock %}
+
+{% block content %}
+<div class="text-center">
+    
+<form method="POST" enctype="multipart/form-data">
+
+    <div class="h1 mt-5">
+        <b>Replace</b>
+    </div>
+
+    <div class="d-grid col-4 mx-auto mt-5">
+        
+        <div class="row"> 
+            <div class="col mt-2">
+                <select class="form-select" name="term1">
+                    {% for term in terms %}
+                    <option value="{{ term }}" {% if term == term_selected1 %}selected{% endif %}>{{ term }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col mt-2">
+                <select class="form-select" name="term2">
+                    {% for term in terms %}
+                    <option value="{{ term }}" {% if term == term_selected2 %}selected{% endif %}>{{ term }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="col mt-2">
+            <input class="btn btn-primary btn-lg mt-2"  type="submit" name="display" value="Display Trees">
+        </div>
+
+        {% macro PrintTree(list) -%}
+        {% for l in list %}
+            {% if l is iterable and (l is not string and l is not mapping) %}
+            
+            {% elif list[loop.index] and (list[loop.index]is iterable and (list[loop.index] is not string and list[loop.index] is not mapping))%}
+            <li>
+                <details open>
+                    <summary><b>{{l}} </b>{% if radio.value == 1 %}<input class="form-check-input pull-right" type="radio" name="replace_index" value={{count.value}}>{% endif %}</summary>
+                    {% set count.value = count.value + 1 %}
+                    <ul>
+                    {{ PrintTree(list[loop.index])}}
+                    </ul>
+                </details>
+            </li>
+            {% else %}
+            <li>
+            <b>{{l}} </b>{% if radio.value == 1 %}<input class="form-check-input pull-right" type="radio" name="replace_index" value={{count.value}}>{% endif %}
+            {% set count.value = count.value + 1 %}
+            </li>
+            {% endif %}
+        {% endfor %}
+        {% endmacro -%}
+
+        {% if tree1 and tree2 %}
+
+        <div class="col mt-2">
+            <b>Tree Representations</b>
+        </div>
+
+        <div class="row">
+            <div class="col text-start mt-2">
+                <div class="form-check-prepend">
+                    {% set radio = namespace(value=1) %}
+                    {% set count = namespace(value=0) %}
+                    <ul class="tree">
+                    {{ PrintTree(tree1) }}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col text-start mt-2">
+                {% set radio = namespace(value=0) %}
+                {% set count = namespace(value=0) %}
+                <ul class="tree">
+                {{ PrintTree(tree2) }}
+                </ul>
+            </div>
+        </div>
+
+        {% endif %}
+
+    </div>
+
+    <div class="col mt-2">
+        <input class="btn btn-primary btn-lg mt-2"  type="submit" name="replace" value="Replace">
+    </div>
+
+    {% if tree3 %}
+
+        <div class="col text-start mt-2">
+            {% set radio = namespace(value=0) %}
+            {% set count = namespace(value=0) %}
+            <ul class="tree">
+            {{ PrintTree(tree3) }}
+            </ul>
+        </div>
+    
+    {% endif %}
+
+    <div class="col mt-2">
+        <input class="btn btn-primary btn-lg"  type="submit" name="home" value="Home Page">
+    </div>
+
+</form>
+
+</div>
+{% endblock %}

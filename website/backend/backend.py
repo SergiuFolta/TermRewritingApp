@@ -78,6 +78,7 @@ def LoadLanguage(input_str: str) -> None:
                 elif input_str[i + 1:next_char_index].count(" ") != (next_char_index - (i + 1)): 
                     # if there aren't just whitespaces, then the "(" is most likely from another function. Assume this is a variable
                     variables.add(term)
+                    continue
                 
                 if input_str[next_char_index] == "(": # this has to be a function
                     functions[term] = CountArguments(input_str[next_char_index:])

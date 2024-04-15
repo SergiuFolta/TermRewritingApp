@@ -170,6 +170,8 @@ def replace():
     tree2 = ""
     term_selected2 = ""
     tree3 = ""
+    term_string = ""
+    term_name = ""
     
     if request.method == 'POST': 
         if request.form.get('home'):
@@ -179,6 +181,7 @@ def replace():
             term_name1 = request.form.get('term1')
             term_selected1 = term_name1
             tree1 = LoadTerm(term_name1)
+            
             if tree1 is not None:
                 tree1 = tree1[1]
             
@@ -206,9 +209,20 @@ def replace():
                 term2 = LoadTerm(term_selected2)[1]
                 replace_position = GetPositionFromListIndex(term1, replace_index)
                 
-                res_term = ReplaceSubtermAtPosition(term1, term2, replace_position)
+                tree3 = ReplaceSubtermAtPosition(term1, term2, replace_position)
+                
+                term_string = CreateInputStringFromTree(ChangeListToTree(tree3))
+        
+        if request.form.get('save'):
+            term_name = request.form.get('name')
+            term_string = request.form.get('string')
+            tree3 = CreateTree(term_string)
+            tree3 = ChangeTreeToList(tree3)
+            SaveTerm(tree3, term_string, term_name)
+            term_dictionary = session["terms"] if "terms" in session else {}
             
-    return render_template("replace.html", terms = terms, term_selected1 = term_selected1, term_selected2 = term_selected2, tree1 = tree1, tree2 = tree2, tree3 = tree3)
+            
+    return render_template("replace.html", terms = terms, term_selected1 = term_selected1, term_selected2 = term_selected2, tree1 = tree1, tree2 = tree2, tree3 = tree3, term_string = term_string, term_name = term_name)
 
 @views.route('/substitutions', methods=['GET', 'POST'])
 def substitutions():

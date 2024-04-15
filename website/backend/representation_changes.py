@@ -95,3 +95,23 @@ def AppendChildrenToNode(term: List, current_node: Node) -> None:
         for child in current_node.next:
             if child.next == []:
                 AppendChildrenToNode(children_stack.pop(0), child)
+                
+                
+def CreateInputStringFromTree(head: Node) -> str:
+    string = f"{head.value}"
+    if head.next != None:
+        string += "("
+    
+    if head.previous != None:
+        if head != head.previous.next[0]:
+            string = ", " + string
+        
+    if head.next != None:
+        for child in head.next:
+            string += CreateInputStringFromTree(child)
+            
+    if head.previous != None:
+        if head == head.previous.next[-1]:
+            string += ")"
+    
+    return string

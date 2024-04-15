@@ -3,7 +3,7 @@ from flask import flash
 from .variables import *
 from .functions import *
 from .node import Node
-from .representation_changes import ChangeListToTree, ChangeTreeToList
+from .representation_changes import *
 from .substitutions import *
 from .database import *
 

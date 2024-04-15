@@ -78,26 +78,20 @@ def AppendChildrenToNode(term: List, current_node: Node) -> None:
         Optional[Node]: returns the tree structure or [] if there's an error
     """
     # ['f1', ['f2', ['i1', ['e'], 'i', ['f', ['x', 'y']]], 'i', ['f', ['i', ['x'], 'y']]]]
-    if len(term) == 1:
-        current_node.value = term[0]
-        return
     
-    child_index = 0
+    children_stack = []
     
-    for elem in term:
-        if type(elem) == list:
-            if current_node.next == None:
-                flash("ERROR: There isn't a Node to continue forward with the list!", category="error")
-                return
-            
-            if child_index == len(current_node.next):
-                flash("ERROR: This function can't accept any more children!", category="error")
-                return
-            
-            AppendChildrenToNode(elem, current_node.next[child_index])
-            child_index += 1
+    for subterm in term:
+        if type(subterm) == list:
+            children_stack.append(subterm)
+            current_node.next[-1].next = []
         else:
             if current_node.next == None:
                 current_node.next = []
             
-            current_node.next.append(Node(value = elem, previous = current_node))
+            current_node.next.append(Node(value = subterm, previous = current_node))
+    
+    if current_node.next != None:
+        for child in current_node.next:
+            if child.next == []:
+                AppendChildrenToNode(children_stack.pop(0), child)

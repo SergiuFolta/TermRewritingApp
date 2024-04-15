@@ -174,7 +174,7 @@ def replace():
     if request.method == 'POST': 
         if request.form.get('home'):
             return redirect(url_for('views.home'))
-           
+        
         if request.form.get('display'):
             term_name1 = request.form.get('term1')
             term_selected1 = term_name1
@@ -198,6 +198,15 @@ def replace():
             replace_index = request.form.get('replace_index')
             
             #Create the new term
+            if replace_index == None: # if no radio button has been selected
+                flash("ERROR: You need to select a subterm from the left term!", category="error")
+            else:
+                replace_index = int(replace_index)
+                term1 = LoadTerm(term_selected1)[1]
+                term2 = LoadTerm(term_selected2)[1]
+                replace_position = GetPositionFromListIndex(term1, replace_index)
+                
+                res_term = ReplaceSubtermAtPosition(term1, term2, replace_position)
             
     return render_template("replace.html", terms = terms, term_selected1 = term_selected1, term_selected2 = term_selected2, tree1 = tree1, tree2 = tree2, tree3 = tree3)
 

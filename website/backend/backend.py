@@ -248,6 +248,73 @@ def PrintTree(head: Node, spacing: int = 2, current_level: int = 0) -> str:
         
     return tree_repr
     
+    
+
+def FlattenList(ls: List) -> List:
+    """
+    Helper function to flatten a nested list.
+
+    Args:
+        list (List): Nested list to flatten
+
+    Returns:
+        List: Flattened list
+    """
+    flatList = []
+    # Iterate with outer list
+    for element in ls:
+        if type(element) == list:
+            flatList += FlattenList(element)
+        else:
+            flatList.append(element)
+    
+    return flatList
+
+
+def GetPositionFromListIndex(term: List, index: int) -> str:
+    """
+    This function takes in an index from the term (imagine it as one long non-nested list)
+    and returns the position of the element taking into consideration our nested list encoding.
+
+    Args:
+        term (List): list representing a term
+        index (int): the index of the subterm we'd like to get 
+
+    Returns:
+        str: position of the subterm you'd like to get (in format "{number}_{number}_{number}").
+                If you want to get the root, position is = ""
+    """
+    position = ""
+    
+    if index == 0:
+        return position
+    
+    term = term[1:]
+    if len(term) == 1:
+        term = term[0]
+    
+    while index != 0:
+        curr_position = 0
+        for item in term:
+            if type(item) == list:
+                flatList = FlattenList(item)
+                
+                if len(flatList) < index:
+                    index -= len(flatList)
+                else:
+                    position += f"_{str(curr_position)}"
+                    term = item
+                    break
+            else:
+                curr_position += 1
+                index -= 1
+                
+                if index == 0:
+                    position += f"_{str(curr_position)}"
+                    break
+    
+    return position[1:] # Skip the first character, which will always be _
+
 
 def GetSubtermAtPosition(term: List, position: str = "") -> List:
     """
@@ -296,25 +363,26 @@ def ReplaceSubtermAtPosition(original_term: List, replacement_term: List, positi
         List: returns the new term after replacement
     """
     if position == "":
-        return original_term
+        return replacement_term
     
     indeces = position.split("_")
-    term = original_term
-    for index in indeces:
-        term = term[1]
-        index = int(index) - 1
-        
-        if index + 1 >= len(term):
-            flash("ERROR: There are not enough subterms for index {index}!", category="error")
-            return
-        
-        term[0] = term[index] # using term[index : index + 2] seems to only copy by value, not by reference.
-        term[1] = term[index + 1] # for once, doing this in C++/Java would've been easier.
-        
-    term[0] = replacement_term[0] # same thing here. term = replacement_term would copy things by value.
-    term[1] = replacement_term[1] # meaning original_term would not be modified.
     
-    return original_term
+    head = ChangeListToTree(original_term)
+    
+    curr_node = head
+    for i in range(0, len(indeces) - 1):
+        index = int(indeces[i]) - 1
+        if curr_node.next != None:
+            curr_node = curr_node.next[index]
+        else:
+            flash(f"ERROR: Cannot replace subterm at index {index + 1}! The position {position} doesn't exist.", category="error")
+            return []
+    
+    curr_node.next[(int(indeces[-1]) - 1)] = ChangeListToTree(replacement_term)
+    
+    new_term = ChangeTreeToList(head)
+    
+    return new_term
 
 
 def IsTermGround(term: List) -> bool:

@@ -130,6 +130,7 @@ def terms():
                 flash("The term \'" + term_name + "\' is ground!")
             elif tree:
                 flash("The term \'" + term_name + "\' is not ground!", category="error")
+            tree = ""
             
     return render_template("terms.html", functions = functions, variables = variables, terms = terms, term_selected = term_selected, tree = tree)
 

@@ -1,5 +1,5 @@
 from flask import session, flash
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Dict
 
 def SaveVariables(variables: set) -> None:
     """
@@ -9,7 +9,6 @@ def SaveVariables(variables: set) -> None:
         variables (set): set which includes the variables in our language
     """
     session["variables"] = list(variables) # sets aren't JSON serializable
-    
 
 def LoadVariables() -> set:
     """
@@ -99,3 +98,22 @@ def LoadTerm(name: str) -> Optional[Tuple[str, List]]:
         return None
     
     return term_dictionary[name]
+
+
+def LoadAllTerms() -> Optional[Dict[str, Tuple[str, List]]]:
+    """
+    This function returns all terms currently in the session.
+
+    Returns:
+        Optional[Dict[str, Tuple[str, List]]]: returns a dictionary of tuples with the string representation 
+        and the list of lists or None if there's an error
+    """
+    return (session["terms"] if "terms" in session else {})
+
+
+def DeleteTerms() -> None:
+    """
+    This function deletes all terms currently found in the session.
+    """
+    session.pop("terms")
+    flash("WARNING: All terms have been deleted because a function or variable contained in an existing term has been modified!")

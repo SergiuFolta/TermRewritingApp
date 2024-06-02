@@ -1,5 +1,6 @@
 from flask import session, flash
 from .database import *
+from .representation_changes import FlattenList
 
 def ModifyFunction(old_function_name: str, curr_function_name: str, function_arity: int) -> None:
     """
@@ -33,6 +34,9 @@ def ModifyFunction(old_function_name: str, curr_function_name: str, function_ari
     SaveFunctions(functions)
 
     flash(f"Successfully modified function {old_function_name} into function {curr_function_name} with arity {function_arity}!")
+    
+    if CheckFunctionInTerm(old_function_name):
+        DeleteTerms()
 
 
 def AddFunction(function_name: str, function_arity: int, verbose: bool = True) -> None:
@@ -83,3 +87,17 @@ def DeleteFunction(function_name: str, verbose: bool = True) -> None:
     SaveFunctions(functions)
     if verbose:
         flash(f"Successfully deleted function {function_name}!")
+    
+    if CheckFunctionInTerm(function_name):
+        DeleteTerms()
+
+
+def CheckFunctionInTerm(function_name: str) -> bool:
+    terms = LoadAllTerms()
+    
+    for _, term in terms.values():
+        flatTerm = FlattenList(term)
+        if function_name in flatTerm:
+            return True
+    
+    return False

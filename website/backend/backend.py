@@ -37,90 +37,90 @@ def CountArguments(function_str: str) -> int:
     return arguments if open_brackets == 0 else -1
 
 
-def LoadLanguage(input_str: str) -> None:
-    """
-        This function takes in a string argument and loads the 
-        found functions and variables into their respective objects.
-    Args:
-        input_str (str): term to load the language from
-    """
-    functions = LoadFunctions()
-    variables = LoadVariables()
+# def LoadLanguage(input_str: str) -> None:
+#     """
+#         This function takes in a string argument and loads the 
+#         found functions and variables into their respective objects.
+#     Args:
+#         input_str (str): term to load the language from
+#     """
+#     functions = LoadFunctions()
+#     variables = LoadVariables()
     
-    i = 0
-    while i < len(input_str):
-        if input_str[i] not in "(), ":
-            term = input_str[i]
-            while i + 1 < len(input_str) and input_str[i + 1] not in "(), ":
-                i += 1
-                term += input_str[i]
+#     i = 0
+#     while i < len(input_str):
+#         if input_str[i] not in "(), ":
+#             term = input_str[i]
+#             while i + 1 < len(input_str) and input_str[i + 1] not in "(), ":
+#                 i += 1
+#                 term += input_str[i]
             
-            check = i
-            while check + 1 < len(input_str) and input_str[check + 1] == " ":
-                check += 1
-                pass
+#             check = i
+#             while check + 1 < len(input_str) and input_str[check + 1] == " ":
+#                 check += 1
+#                 pass
                 
-            if i + 1 == len(input_str): # this should just be an atomic variable
-                if len(variables) + len(functions) == 0: # this should be the ONLY term
-                    variables.add(term)
-                else:
-                    flash("ERROR: String invalid. It ends with a term, but it's not an atomic term.", category='error')
-                    return
+#             if i + 1 == len(input_str): # this should just be an atomic variable
+#                 if len(variables) + len(functions) == 0: # this should be the ONLY term
+#                     variables.add(term)
+#                 else:
+#                     flash("ERROR: String invalid. It ends with a term, but it's not an atomic term.", category='error')
+#                     return
             
-            if check != i and input_str[check + 1] not in ",)":
-                flash("ERROR: You either need a comma between variables in the same function or to close the function.", category="error")
-                return
+#             if check != i and input_str[check + 1] not in ",)":
+#                 flash("ERROR: You either need a comma between variables in the same function or to close the function.", category="error")
+#                 return
                 
-            if term not in variables and term not in functions:
-                next_char_index = input_str.find("(", i + 1)
-                if next_char_index == -1: # this is certainly a variable
-                    variables.add(term)
-                elif input_str[i + 1:next_char_index].count(" ") != (next_char_index - (i + 1)): 
-                    # if there aren't just whitespaces, then the "(" is most likely from another function. Assume this is a variable
-                    variables.add(term)
-                    continue
+#             if term not in variables and term not in functions:
+#                 next_char_index = input_str.find("(", i + 1)
+#                 if next_char_index == -1: # this is certainly a variable
+#                     variables.add(term)
+#                 elif input_str[i + 1:next_char_index].count(" ") != (next_char_index - (i + 1)): 
+#                     # if there aren't just whitespaces, then the "(" is most likely from another function. Assume this is a variable
+#                     variables.add(term)
+#                     continue
                 
-                if input_str[next_char_index] == "(": # this has to be a function
-                    functions[term] = CountArguments(input_str[next_char_index:])
+#                 if input_str[next_char_index] == "(": # this has to be a function
+#                     functions[term] = CountArguments(input_str[next_char_index:])
                     
-                    if functions[term] == -1:
-                        flash(f"ERROR: String is invalid, couldn't determine number of arguments for function {term}!", category='error')
-                        return
-                else: # this is a variable
-                    variables.add(term)
-            elif term in functions:
-                next_char_index = input_str.find("(", i + 1)
-                if next_char_index == -1:
-                    flash(f"ERROR: {term} found again, should be a function but is now a variable."
-                            , category='error')
-                    return
-                elif functions[term] == 0 and input_str[i + 1:next_char_index].count(" ") != (next_char_index - (i + 1)): 
-                    # if there aren't just whitespaces, then the "(" is most likely from another function. 
-                    # Assume this is a constant function that was previously written with "()" notation
-                    i += 1
-                    continue
+#                     if functions[term] == -1:
+#                         flash(f"ERROR: String is invalid, couldn't determine number of arguments for function {term}!", category='error')
+#                         return
+#                 else: # this is a variable
+#                     variables.add(term)
+#             elif term in functions:
+#                 next_char_index = input_str.find("(", i + 1)
+#                 if next_char_index == -1:
+#                     flash(f"ERROR: {term} found again, should be a function but is now a variable."
+#                             , category='error')
+#                     return
+#                 elif functions[term] == 0 and input_str[i + 1:next_char_index].count(" ") != (next_char_index - (i + 1)): 
+#                     # if there aren't just whitespaces, then the "(" is most likely from another function. 
+#                     # Assume this is a constant function that was previously written with "()" notation
+#                     i += 1
+#                     continue
                     
-                if input_str[next_char_index] == "(": # this has to be a function
-                    arguments = CountArguments(input_str[next_char_index:])
+#                 if input_str[next_char_index] == "(": # this has to be a function
+#                     arguments = CountArguments(input_str[next_char_index:])
                     
-                    if arguments != functions[term]:
-                        flash(f"ERROR: Function {term} found again, taking a different number of arguments than before! \
-                                Found {functions[term]} before, now found {arguments}.", category='error')
-                        return
-                else: # this was previously recognized as a function, but is now a variable
-                    flash(f"ERROR: {term} was previously a function, but is a variable in this term!", category="error")
-                    return
-            elif term in variables:
-                next_char_index = input_str.find("(", i + 1)
-                if input_str[i + 1:next_char_index].count(" ") == (next_char_index - (i + 1)):
-                    # this means this is a function in our string, but was previously a variable
-                    flash(f"ERROR: {term} found again, should be a variable but is now a function." , category='error')
-                    return
+#                     if arguments != functions[term]:
+#                         flash(f"ERROR: Function {term} found again, taking a different number of arguments than before! \
+#                                 Found {functions[term]} before, now found {arguments}.", category='error')
+#                         return
+#                 else: # this was previously recognized as a function, but is now a variable
+#                     flash(f"ERROR: {term} was previously a function, but is a variable in this term!", category="error")
+#                     return
+#             elif term in variables:
+#                 next_char_index = input_str.find("(", i + 1)
+#                 if input_str[i + 1:next_char_index].count(" ") == (next_char_index - (i + 1)):
+#                     # this means this is a function in our string, but was previously a variable
+#                     flash(f"ERROR: {term} found again, should be a variable but is now a function." , category='error')
+#                     return
         
-        i += 1
+#         i += 1
     
-    SaveFunctions(functions)
-    SaveVariables(variables)
+#     SaveFunctions(functions)
+#     SaveVariables(variables)
 
 
 def CreateTree(input_str: str) -> Optional[Node] :
@@ -140,72 +140,80 @@ def CreateTree(input_str: str) -> Optional[Node] :
     head = Node()
     current_node = head
     
-    for i in range(len(input_str)):
+    input_str = input_str.replace(" ", "") # don't allow any whitespaces, they only make things more difficult
+    i = 0
+    while i < len(input_str):
         str = input_str[i]
         
-        if str not in "(), ":
-            while i + 1 < len(input_str) and input_str[i + 1] not in "(), ":
+        if str not in "(),":
+            # this case looks out for variable names of varying length
+            while i + 1 < len(input_str) and input_str[i + 1] not in "(),":
                 i += 1
                 str += input_str[i]
         
-        if str in functions.keys(): # if current char represents a function
+        if str in functions.keys(): # if current string represents a function
             if current_node.value != "":
                 flash("ERROR: More than one function is trying to occupy the same node!", category='error')
                 return None
-            current_node.value = str # first we note this down
+            current_node.value = str # first we note this down as our current value
             
-            if functions[str] > 0:
-                current_node.next = [] # we prepare a list of Nodes if the function takes more than zero arguments
+            if functions[str] > 0: # if the number of arguments is higher than 0
+                current_node.next = [] # we prepare a list of Nodes
 
                 for _ in range(0, functions[str]): # then we add as many further Nodes as the function has possible arguments
                     current_node.next.append(Node(previous=current_node))
         elif str == '(':
-            if current_node.next == None and current_node.value not in functions:
+            if current_node.value in variables:
                 flash("ERROR: There's an open paranthesis, but we're not expecting any arguments!", category='error')
                 return None
             
             if functions[current_node.value] > 0:
                 current_node = current_node.next[0] # we go in the first Node in the list of children of the current one
+            elif input_str[i + 1] == ')':
+                i += 1 # constant function with paranthesis, but it's well closed so we just move on.
+            else:
+                flash("ERROR: There's an open paranthesis, but the current function is constant!", category='error')
+                return None
         elif str == ')':
-            if current_node.previous == None:
+            if current_node.previous == None: # we have no parent to jump to in our tree
                 flash("ERROR: There are too many closed parantheses!", category='error')
                 return None
             
-            if current_node.next != None:
-                for node in current_node.next:
-                    if node.value == "":
+            if current_node.next != None: # if this is a function
+                for node in current_node.next: # we check all children
+                    if node.value == "": # and make sure none are still expecting a value
                         flash("ERROR: Function is still expecting arguments!", category='error')
                         return None
             
-            if current_node.value == "":
-                flash("ERROR: Function is still expecting arguments!", category='error')
-                return None
+            # not sure why this case is here so let's just comment it out for now
+            # if current_node.value == "":
+            #     flash("ERROR: Function is still expecting arguments!", category='error')
+            #     return None
             
-            modified_str = input_str[:i + 1].replace(" ", "")
-            if len(modified_str) - 1 - modified_str.rfind("(") != 1: # this would otherwise be a constant function and we don't want to jump
-                current_node = current_node.previous # we jump one level above our current one
+            current_node = current_node.previous # we jump one level above our current one
         elif str == ',':
             if current_node.previous == None: # if there is no higher level to jump to
                 flash("ERROR: Too many commas!", category='error')
                 return None
             
+            current_child = current_node
             current_node = current_node.previous # we need to jump a level up
-            initial_node = current_node
-            for node in current_node.next: # look for a Node which hasn't been populated yet
-                if node.value == "":
-                    current_node = node
-                    break
-                
-            if current_node == initial_node: # we couldn't find an unpopulated Node
-                print(current_node.value)
-                flash("ERROR: Function given more arguments than it can accept!", category='error')
+
+            child_index = current_node.next.index(current_child)
+            
+            if child_index + 1 == len(current_node.next): # this is the last argument we were expecting
+                flash("ERROR: There are more arguments for this function than we were expecting! Check commas.", category="error")
                 return None
+            
+            current_node = current_node.next[child_index + 1]
         elif str in variables:
             if current_node.value != "":
                 flash("ERROR: More than one variable is trying to occupy the same node!", category='error')
                 return None
             
             current_node.value = str
+        
+        i += 1
 
     return head
 
@@ -247,28 +255,6 @@ def PrintTree(head: Node, spacing: int = 2, current_level: int = 0) -> str:
             stack[len(stack) - len(node.next):] = reversed(stack[len(stack) - len(node.next):])
         
     return tree_repr
-    
-    
-
-def FlattenList(ls: List) -> List:
-    """
-    Helper function to flatten a nested list.
-
-    Args:
-        list (List): Nested list to flatten
-
-    Returns:
-        List: Flattened list
-    """
-    flatList = []
-    # Iterate with outer list
-    for element in ls:
-        if type(element) == list:
-            flatList += FlattenList(element)
-        else:
-            flatList.append(element)
-    
-    return flatList
 
 
 def GetPositionFromListIndex(term: List, index: int) -> str:

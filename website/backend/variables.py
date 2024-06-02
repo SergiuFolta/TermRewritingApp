@@ -1,5 +1,6 @@
 from flask import session, flash
 from .database import *
+from .representation_changes import FlattenList
 
 def ModifyVariable(old_variable_name: str, curr_variable_name: str) -> None:
     """
@@ -31,6 +32,9 @@ def ModifyVariable(old_variable_name: str, curr_variable_name: str) -> None:
         SaveVariables(variables)
 
         flash(f"Successfully modified variable {old_variable_name} into variable {curr_variable_name}!")
+    
+    if CheckVariableInTerm(old_variable_name):
+        DeleteTerms()
 
 
 def AddVariable(variable_name: str, verbose: bool = True) -> None:
@@ -80,3 +84,16 @@ def DeleteVariable(variable_name: str, verbose: bool = True) -> None:
     
     if verbose:
         flash(f"Successfully deleted function {variable_name}!")
+        
+    if CheckVariableInTerm(variable_name):
+        DeleteTerms()
+
+def CheckVariableInTerm(var_name: str) -> bool:
+    terms = LoadAllTerms()
+    
+    for _, term in terms.values():
+        flatTerm = FlattenList(term)
+        if var_name in flatTerm:
+            return True
+    
+    return False

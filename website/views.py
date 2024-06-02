@@ -96,7 +96,7 @@ def variables():
                 DeleteVariable(v)
                 break
             
-        SaveVariables(variables)
+        variables = LoadVariables()
     
     return render_template("variables.html", variables = variables)
 
@@ -147,8 +147,8 @@ def createterm():
         session["term_name"] = term_name
         session["term_string"] = term_string
         
-        if request.form.get('detect'):
-            LoadLanguage(term_string)
+        # if request.form.get('detect'):
+        #     LoadLanguage(term_string)
             
         if request.form.get('save'):
             head = CreateTree(term_string)

@@ -115,3 +115,24 @@ def CreateInputStringFromTree(head: Node) -> str:
             string += ")"
     
     return string
+
+
+def FlattenList(ls: List) -> List:
+    """
+    Helper function to flatten a nested list.
+
+    Args:
+        list (List): Nested list to flatten
+
+    Returns:
+        List: Flattened list
+    """
+    flatList = []
+    # Iterate with outer list
+    for element in ls:
+        if type(element) == list:
+            flatList += FlattenList(element)
+        else:
+            flatList.append(element)
+    
+    return flatList

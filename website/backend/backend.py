@@ -405,3 +405,58 @@ def IsTermGround(term: List) -> bool:
                 stack.append([curr_term[i]])
     
     return True # passed all checks, this is ground
+
+
+class Term:
+    def __init__(self, symbol, *args):
+        self.symbol = symbol
+        self.args = args
+
+    def is_variable(self):
+        return not self.args
+
+    def __str__(self):
+        if self.is_variable():
+            return self.symbol
+        else:
+            return f"{self.symbol}({', '.join(map(str, self.args))})"
+
+def lpo(term1, term2):
+    if term1 == term2:
+        return 0
+    if term1.is_variable():
+        if term2.is_variable():
+            return 0
+        return -1 if term1.symbol in str(term2) else 1
+    if term2.is_variable():
+        return 1 if term2.symbol in str(term1) else -1
+
+    if precedence[term1.symbol] < precedence[term2.symbol]:
+        return -1
+    if precedence[term1.symbol] > precedence[term2.symbol]:
+        return 1
+
+    for a, b in zip(term1.args, term2.args):
+        comp = lpo(a, b, precedence)
+        if comp != 0:
+            return comp
+    return 0
+
+# Example usage
+if __name__ == "__main__":
+    # Define precedence: lower value means higher precedence
+    precedence = {'f': 1, 'g': 2, 'a': 3, 'b': 4}
+
+    # Terms
+    term1 = Term('f', Term('a'))
+    term2 = Term('g', Term('f', Term('a')), Term('b'))
+
+    # Compare terms using LPO
+    comparison = lpo(term1, term2, precedence)
+    if comparison < 0:
+        print(f"{term1} < {term2}")
+    elif comparison > 0:
+        print(f"{term1} > {term2}")
+    else:
+        print(f"{term1} == {term2}")
+        

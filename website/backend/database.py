@@ -117,3 +117,23 @@ def DeleteTerms() -> None:
     """
     session.pop("terms")
     flash("WARNING: All terms have been deleted because a function or variable contained in an existing term has been modified!")
+
+
+def SavePrecedences(precedences: dict) -> None:
+    """
+    This function saves the {precedences} dictionary in the current user session.
+
+    Args:
+        precedences (dict): dictionary which includes the precedences in our language
+    """
+    session["precedences"] = precedences
+    
+
+def LoadPrecedences() -> Dict[str, int]:
+    """
+    This function returns the dictionary with the precedences in our language.
+
+    Returns:
+        Dict[str, int]: returns a dictionary with the name of the atomic term and their precedence
+    """
+    return session["precedences"] if "precedences" in session else {}

@@ -105,10 +105,3 @@ def CheckFunctionInTerm(function_name: str) -> bool:
             return True
     
     return False
-
-
-def ModifyPrecedence(functions : dict) -> None:
-    functions = dict(sorted(functions.items(), key=lambda item: item[1], reverse=True))
-
-    for index, functionName in enumerate(functions.keys()):
-        functions[functionName] = (functions[functionName], index)

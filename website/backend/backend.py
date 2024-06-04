@@ -407,39 +407,40 @@ def IsTermGround(term: List) -> bool:
     return True # passed all checks, this is ground
 
 
-class Term:
-    def __init__(self, symbol, *args):
-        self.symbol = symbol
-        self.args = args
+def TermIsVariable(term : List) -> bool:
+    return len(term) == 1
 
-    def is_variable(self):
-        return not self.args
 
-    def __str__(self):
-        if self.is_variable():
-            return self.symbol
-        else:
-            return f"{self.symbol}({', '.join(map(str, self.args))})"
-
-def lpo(term1, term2):
+def LexicographicPathOrdering(term1 : List, term2 : List) -> int:
+    precedence = LoadPrecedences()
+    
     if term1 == term2:
         return 0
-    if term1.is_variable():
-        if term2.is_variable():
+    
+    flat_term1 = FlattenList(term1)
+    flat_term2 = FlattenList(term2)
+    
+    if TermIsVariable(term1):
+        if TermIsVariable(term2):
             return 0
-        return -1 if term1.symbol in str(term2) else 1
-    if term2.is_variable():
-        return 1 if term2.symbol in str(term1) else -1
+        
+        return -1 if term1[0] in flat_term2 else 1
+    
+    if TermIsVariable(term2):
+        return 1 if term2[0] in flat_term1 else -1
 
-    if precedence[term1.symbol] < precedence[term2.symbol]:
+    if precedence[term1[0]] < precedence[term2[0]]:
         return -1
-    if precedence[term1.symbol] > precedence[term2.symbol]:
+    
+    if precedence[term1[0]] > precedence[term2[0]]:
         return 1
 
-    for a, b in zip(term1.args, term2.args):
-        comp = lpo(a, b, precedence)
+    for subterm1, subterm2 in zip(term1[1:], term2[1:]):
+        comp = LexicographicPathOrdering(subterm1, subterm2, precedence)
+        
         if comp != 0:
             return comp
+        
     return 0
 
 # Example usage

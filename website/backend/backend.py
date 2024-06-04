@@ -123,101 +123,6 @@ def CountArguments(function_str: str) -> int:
 #     SaveVariables(variables)
 
 
-def CreateTree(input_str: str) -> Optional[Node] :
-    """
-        This function takes in a string argument and returns the corresponding 
-        tree, if it can be created. It will otherwise return None.
-    Args:
-        input_str (str): term to create the tree from
-
-    Returns:
-        Optional[Node]: returns the head of the tree or None if it can't be created
-    """
-    
-    functions = LoadFunctions()
-    variables = LoadVariables()
-    
-    head = Node()
-    current_node = head
-    
-    input_str = input_str.replace(" ", "") # don't allow any whitespaces, they only make things more difficult
-    i = 0
-    while i < len(input_str):
-        str = input_str[i]
-        
-        if str not in "(),":
-            # this case looks out for variable names of varying length
-            while i + 1 < len(input_str) and input_str[i + 1] not in "(),":
-                i += 1
-                str += input_str[i]
-        
-        if str in functions.keys(): # if current string represents a function
-            if current_node.value != "":
-                flash("ERROR: More than one function is trying to occupy the same node!", category='error')
-                return None
-            current_node.value = str # first we note this down as our current value
-            
-            if functions[str] > 0: # if the number of arguments is higher than 0
-                current_node.next = [] # we prepare a list of Nodes
-
-                for _ in range(0, functions[str]): # then we add as many further Nodes as the function has possible arguments
-                    current_node.next.append(Node(previous=current_node))
-        elif str == '(':
-            if current_node.value in variables:
-                flash("ERROR: There's an open paranthesis, but we're not expecting any arguments!", category='error')
-                return None
-            
-            if functions[current_node.value] > 0:
-                current_node = current_node.next[0] # we go in the first Node in the list of children of the current one
-            elif input_str[i + 1] == ')':
-                i += 1 # constant function with paranthesis, but it's well closed so we just move on.
-            else:
-                flash("ERROR: There's an open paranthesis, but the current function is constant!", category='error')
-                return None
-        elif str == ')':
-            if current_node.previous == None: # we have no parent to jump to in our tree
-                flash("ERROR: There are too many closed parantheses!", category='error')
-                return None
-            
-            if current_node.next != None: # if this is a function
-                for node in current_node.next: # we check all children
-                    if node.value == "": # and make sure none are still expecting a value
-                        flash("ERROR: Function is still expecting arguments!", category='error')
-                        return None
-            
-            # not sure why this case is here so let's just comment it out for now
-            # if current_node.value == "":
-            #     flash("ERROR: Function is still expecting arguments!", category='error')
-            #     return None
-            
-            current_node = current_node.previous # we jump one level above our current one
-        elif str == ',':
-            if current_node.previous == None: # if there is no higher level to jump to
-                flash("ERROR: Too many commas!", category='error')
-                return None
-            
-            current_child = current_node
-            current_node = current_node.previous # we need to jump a level up
-
-            child_index = current_node.next.index(current_child)
-            
-            if child_index + 1 == len(current_node.next): # this is the last argument we were expecting
-                flash("ERROR: There are more arguments for this function than we were expecting! Check commas.", category="error")
-                return None
-            
-            current_node = current_node.next[child_index + 1]
-        elif str in variables:
-            if current_node.value != "":
-                flash("ERROR: More than one variable is trying to occupy the same node!", category='error')
-                return None
-            
-            current_node.value = str
-        
-        i += 1
-
-    return head
-
-
 def PrintTree(head: Node, spacing: int = 2, current_level: int = 0) -> str:
     """
     This function takes in the head of a tree and prints the content out to the console.
@@ -391,7 +296,7 @@ def IsTermGround(term: List) -> bool:
         curr_term = stack.pop()
         value = curr_term[0]
         
-        if value in variables:
+        if value in variables.keys():
             return False # found a variable, quit.
         
         if len(curr_term) > 1:
@@ -408,56 +313,116 @@ def IsTermGround(term: List) -> bool:
 
 
 def TermIsVariable(term : List) -> bool:
-    return len(term) == 1
+    variables = LoadVariables()
+    if len(term) == 1 and term[0] in variables:
+        return True
+    
+    return False
 
 
 def LexicographicPathOrdering(term1 : List, term2 : List) -> int:
-    precedence = LoadPrecedences()
-    
+    # s = term1
+    # t = term2
+    print(f"Term 1 = {term1}, Term2 = {term2}")
     if term1 == term2:
         return 0
     
     flat_term1 = FlattenList(term1)
     flat_term2 = FlattenList(term2)
     
-    if TermIsVariable(term1):
-        if TermIsVariable(term2):
-            return 0
-        
-        return -1 if term1[0] in flat_term2 else 1
-    
+    print("In LPO1")
+    # LPO1
     if TermIsVariable(term2):
-        return 1 if term2[0] in flat_term1 else -1
-
-    if precedence[term1[0]] < precedence[term2[0]]:
-        return -1
+        if term2[0] in flat_term1:
+            return 1
+        else:
+            return -1
     
-    if precedence[term1[0]] > precedence[term2[0]]:
-        return 1
-
-    for subterm1, subterm2 in zip(term1[1:], term2[1:]):
-        comp = LexicographicPathOrdering(subterm1, subterm2, precedence)
+    if TermIsVariable(term1):
+        return -1
         
-        if comp != 0:
-            return comp
+    print("In LPO2a")
+    # LPO2
+    # LPO2a)
+    precedences = LoadPrecedences()
+    subterms1 = []
+    i = 0
+    term1_args = term1[1]
+    while i < len(term1_args):
+        if i + 1 == len(term1_args): # last element
+            subterms1.append([term1_args[i]])
+            i += 1
+        elif type(term1_args[i + 1]) == list: # this is a function
+            subterms1.append([term1_args[i], term1_args[i + 1]])
+            i += 2
+        else: # this is a variable
+            subterms1.append([term1_args[i]])
+            i += 1
+    
+    print(f"Subterms of term 1: {subterms1}")
+    
+    functions = LoadFunctions()
+    for subterm in subterms1:
+        if LexicographicPathOrdering(subterm, term2) == True:
+            return 1
+    
+    print("In LPO2b")
+    # LPO2b)
+    subterms2 = []
+    i = 0
+    term2_args = term2[1]
+    while i < len(term2_args):
+        if i + 1 == len(term2_args): # last element
+            subterms2.append([term2_args[i]])
+            i += 1
+        elif type(term2_args[i + 1]) == list: # this is a function
+            subterms2.append([term2_args[i], term2_args[i + 1]])
+            i += 2
+        else: # this is a variable
+            subterms2.append([term2_args[i]])
+            i += 1
+    
+    print(f"Subterms of term 2: {subterms2}")
+    
+    if precedences[term1[0]] > precedences[term2[0]]:
+        found = False
+        for subterm in subterms2:
+            if LexicographicPathOrdering(term1, subterm) == False:
+                found = True
+                break
         
-    return 0
-
-# Example usage
-if __name__ == "__main__":
-    # Define precedence: lower value means higher precedence
-    precedence = {'f': 1, 'g': 2, 'a': 3, 'b': 4}
-
-    # Terms
-    term1 = Term('f', Term('a'))
-    term2 = Term('g', Term('f', Term('a')), Term('b'))
-
-    # Compare terms using LPO
-    comparison = lpo(term1, term2, precedence)
-    if comparison < 0:
-        print(f"{term1} < {term2}")
-    elif comparison > 0:
-        print(f"{term1} > {term2}")
-    else:
-        print(f"{term1} == {term2}")
+        if not found:
+            return 1
+            
+    print("In LPO2c")
+    # LPO2c)
+    if precedences[term1[0]] == precedences[term2[0]]:
+        for subterm in subterms2:
+            if LexicographicPathOrdering(term1, subterm) == False:
+                return -1
         
+        for i in range(len(subterms1)):
+            value = LexicographicPathOrdering(subterms1[i], subterms2[i])
+            if value == 0:
+                continue
+        
+            if value == 1:
+                return 1
+            
+            if value == -1:
+                return -1
+    
+    return -1
+
+
+def FindMaximumIndexInTerm(term : List) -> int:
+    flatTerm = FlattenList(term)
+    variables = LoadVariables()
+    maxIndex = -1
+    
+    for atom in flatTerm:
+        if atom in variables.keys():
+            if variables[atom] > maxIndex:
+                maxIndex = variables[atom]
+            
+    return maxIndex

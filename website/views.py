@@ -76,7 +76,7 @@ def functions():
 
 @views.route('/variables', methods=['GET', 'POST'])
 def variables():
-    variables = LoadVariables()
+    variables = LoadVariables().keys()
     
     if request.method == 'POST':
         if request.form.get('home'):
@@ -96,14 +96,14 @@ def variables():
                 DeleteVariable(v)
                 break
             
-        variables = LoadVariables()
+        variables = LoadVariables().keys()
     
     return render_template("variables.html", variables = variables)
 
 @views.route('/terms', methods=['GET', 'POST'])
 def terms():
     functions = LoadFunctions()
-    variables = LoadVariables()
+    variables = LoadVariables().keys()
     term_dictionary = session["terms"] if "terms" in session else {}
     terms = term_dictionary.keys()
     tree = ""
@@ -148,8 +148,14 @@ def createterm():
         session["term_name"] = term_name
         session["term_string"] = term_string
         
-        # if request.form.get('detect'):
-        #     LoadLanguage(term_string)
+        if request.form.get('detect'):
+            terms = LoadAllTerms()
+            
+            if len(terms) >= 2:
+                term_1 = terms["term1"][1]
+                term_2 = terms["term2"][1]
+                print(LexicographicPathOrdering(term_1, term_2))
+                print(LoadPrecedences())
             
         if request.form.get('save'):
             head = CreateTree(term_string)
@@ -157,7 +163,7 @@ def createterm():
             SaveTerm(tree, term_string, term_name)
     
     functions = LoadFunctions()
-    variables = LoadVariables()
+    variables = LoadVariables().keys()
     term_dictionary = session["terms"] if "terms" in session else {}
     terms = term_dictionary.keys()
     return render_template("createterm.html", term_name = term_name, term_string = term_string, functions = functions, variables = variables, terms = terms)

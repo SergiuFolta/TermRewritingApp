@@ -16,7 +16,7 @@ def ModifyVariable(old_variable_name: str, curr_variable_name: str) -> None:
     
     variables = LoadVariables()
     
-    if old_variable_name not in variables:
+    if old_variable_name not in variables.keys():
         flash(f"ERROR: Could not find variable {old_variable_name} in our set!", category="error")
         return
 
@@ -47,7 +47,7 @@ def AddVariable(variable_name: str, verbose: bool = True) -> None:
     """
     variables = LoadVariables()
 
-    if variable_name in variables:
+    if variable_name in variables.keys():
         flash(f"ERROR: There is already a variable with the name {variable_name}!", category="error")
         return
 
@@ -56,7 +56,7 @@ def AddVariable(variable_name: str, verbose: bool = True) -> None:
         flash(f"ERROR: There is already a function with the name {variable_name}!", category="error")
         return
 
-    variables.add(variable_name)
+    variables[variable_name] = len(variables)
     
     SaveVariables(variables)
 

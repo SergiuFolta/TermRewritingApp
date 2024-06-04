@@ -31,8 +31,6 @@ def ModifyFunction(old_function_name: str, curr_function_name: str, function_ari
     
     functions[curr_function_name] = function_arity # modify the function arity
     
-    ModifyPrecedence(functions)
-    
     SaveFunctions(functions)
 
     flash(f"Successfully modified function {old_function_name} into function {curr_function_name} with arity {function_arity}!")
@@ -63,8 +61,6 @@ def AddFunction(function_name: str, function_arity: int, verbose: bool = True) -
         return
 
     functions[function_name] = function_arity
-    
-    ModifyPrecedence(functions)
     
     SaveFunctions(functions)
 

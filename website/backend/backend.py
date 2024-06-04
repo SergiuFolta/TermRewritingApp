@@ -328,7 +328,6 @@ def LexicographicPathOrdering(term1 : List, term2 : List) -> int:
         return 0
     
     flat_term1 = FlattenList(term1)
-    flat_term2 = FlattenList(term2)
     
     print("In LPO1")
     # LPO1
@@ -347,6 +346,9 @@ def LexicographicPathOrdering(term1 : List, term2 : List) -> int:
     precedences = LoadPrecedences()
     subterms1 = []
     i = 0
+    if len(term1) == 1: # constant function
+        return -1
+    
     term1_args = term1[1]
     while i < len(term1_args):
         if i + 1 == len(term1_args): # last element
@@ -360,16 +362,22 @@ def LexicographicPathOrdering(term1 : List, term2 : List) -> int:
             i += 1
     
     print(f"Subterms of term 1: {subterms1}")
-    
-    functions = LoadFunctions()
+
     for subterm in subterms1:
-        if LexicographicPathOrdering(subterm, term2) == True:
+        value = LexicographicPathOrdering(subterm, term2)
+        if value == 0 or value == 1:
             return 1
     
     print("In LPO2b")
     # LPO2b)
     subterms2 = []
     i = 0
+    if len(term2) == 1: # constant function
+        if precedences[term1[0]] > precedences[term2[0]]:
+            return 1
+        else:
+            return -1
+    
     term2_args = term2[1]
     while i < len(term2_args):
         if i + 1 == len(term2_args): # last element
@@ -378,7 +386,7 @@ def LexicographicPathOrdering(term1 : List, term2 : List) -> int:
         elif type(term2_args[i + 1]) == list: # this is a function
             subterms2.append([term2_args[i], term2_args[i + 1]])
             i += 2
-        else: # this is a variable
+        else: # this is a variable (or a constant function)
             subterms2.append([term2_args[i]])
             i += 1
     

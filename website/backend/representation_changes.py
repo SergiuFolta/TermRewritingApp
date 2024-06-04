@@ -95,7 +95,7 @@ def CreateTree(input_str: str) -> Optional[Node]:
             current_node.value = str
         
         i += 1
- 
+
     return head
 
 
@@ -116,7 +116,8 @@ def ChangeTreeToList(head: Node) -> List:
     
     list.append(head.value)
     
-    list.append(AppendChildrenNodesToList(head))
+    if head.next:
+        list.append(AppendChildrenNodesToList(head))
     
     return list
 

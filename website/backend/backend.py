@@ -226,14 +226,31 @@ def GetSubtermAtPosition(term: List, position: str = "") -> List:
     indeces = position.split("_")
     
     for index in indeces:
-        term = term[1]
-        index = int(index) - 1
-
-        if index + 1 >= len(term):
-            flash("ERROR: There are not enough subterms for index {index}!", category="error")
-            return
+        if len(term) == 1:
+            flash(f"Couldn't find element at position {position}. Stopped at {index}.", category="error")
+            return []
         
-        term = term[index : index + 2]
+        index = int(index)
+        term_args = term[1]
+
+        subterms = []
+        i = 0
+        while i < len(term_args):
+            if i + 1 == len(term_args): # last element
+                subterms.append([term_args[i]])
+                i += 1
+            elif type(term_args[i + 1]) == list: # this is a function
+                subterms.append([term_args[i], term_args[i + 1]])
+                i += 2
+            else: # this is a variable (or a constant function)
+                subterms.append([term_args[i]])
+                i += 1
+
+        if index > len(subterms):
+            flash(f"ERROR: There are not enough subterms for index {index}!", category="error")
+            return []
+        
+        term = subterms[index - 1]
         
     return term
 
@@ -296,7 +313,7 @@ def IsTermGround(term: List) -> bool:
         curr_term = stack.pop()
         value = curr_term[0]
         
-        if value in variables.keys():
+        if value in variables:
             return False # found a variable, quit.
         
         if len(curr_term) > 1:
@@ -320,16 +337,16 @@ def TermIsVariable(term : List) -> bool:
     return False
 
 
-def LexicographicPathOrdering(term1 : List, term2 : List) -> int:
+def LexicographicPathOrdering(term1: List, term2: List) -> int:
     # s = term1
     # t = term2
-    print(f"Term 1 = {term1}, Term2 = {term2}")
+    # print(f"Term 1 = {term1}, Term2 = {term2}")
     if term1 == term2:
         return 0
     
     flat_term1 = FlattenList(term1)
     
-    print("In LPO1")
+    # print("In LPO1")
     # LPO1
     if TermIsVariable(term2):
         if term2[0] in flat_term1:
@@ -340,7 +357,7 @@ def LexicographicPathOrdering(term1 : List, term2 : List) -> int:
     if TermIsVariable(term1):
         return -1
         
-    print("In LPO2a")
+    # print("In LPO2a")
     # LPO2
     # LPO2a)
     precedences = LoadPrecedences()
@@ -361,14 +378,14 @@ def LexicographicPathOrdering(term1 : List, term2 : List) -> int:
             subterms1.append([term1_args[i]])
             i += 1
     
-    print(f"Subterms of term 1: {subterms1}")
+    # print(f"Subterms of term 1: {subterms1}")
 
     for subterm in subterms1:
         value = LexicographicPathOrdering(subterm, term2)
         if value == 0 or value == 1:
             return 1
     
-    print("In LPO2b")
+    # print("In LPO2b")
     # LPO2b)
     subterms2 = []
     i = 0
@@ -390,7 +407,7 @@ def LexicographicPathOrdering(term1 : List, term2 : List) -> int:
             subterms2.append([term2_args[i]])
             i += 1
     
-    print(f"Subterms of term 2: {subterms2}")
+    # print(f"Subterms of term 2: {subterms2}")
     
     if precedences[term1[0]] > precedences[term2[0]]:
         found = False
@@ -402,7 +419,7 @@ def LexicographicPathOrdering(term1 : List, term2 : List) -> int:
         if not found:
             return 1
             
-    print("In LPO2c")
+    # print("In LPO2c")
     # LPO2c)
     if precedences[term1[0]] == precedences[term2[0]]:
         for subterm in subterms2:
@@ -422,15 +439,138 @@ def LexicographicPathOrdering(term1 : List, term2 : List) -> int:
     
     return -1
 
-
-def FindMaximumIndexInTerm(term : List) -> int:
-    flatTerm = FlattenList(term)
-    variables = LoadVariables()
-    maxIndex = -1
+# Critical Pair functions
+def GetAllFunctionPositions(term: List) -> List[str]:
+    if TermIsVariable(term):
+        return []
     
-    for atom in flatTerm:
-        if atom in variables.keys():
-            if variables[atom] > maxIndex:
-                maxIndex = variables[atom]
-            
-    return maxIndex
+    positions = []
+    
+    flatTerm = FlattenList(term)
+    functions = LoadFunctions()
+    
+    for i in range(len(flatTerm)):
+        if flatTerm[i] in functions.keys():
+            positions.append(GetPositionFromListIndex(term, i))
+    
+    return positions
+
+
+def GetUniqueVariables(term: List) -> set:
+    variables = set()
+    
+    term = FlattenList(term)
+    for subterm in term:
+        if TermIsVariable(subterm):
+            variables.add(subterm)
+    
+    return variables
+
+
+def ReplaceCoincidingVariables(vars1: set, vars2: set, term: List) -> List:
+    nonuniqueVars = vars1.intersection(vars2)
+    
+    varRules = {}
+        
+    variables = LoadVariables()
+    flatTerm = FlattenList(term)
+
+    for var in nonuniqueVars:
+        newVarName = var + "'"
+        while newVarName in flatTerm:
+            newVarName += "'"
+        
+        varRules[var] = newVarName
+        if newVarName not in variables:
+            AddVariable(newVarName, False)
+    
+    newTerm = ChangeTreeToList(ChangeListToTree(term))
+    for key, value in varRules.items():
+        newTerm = ApplySubstitutionRecursive((key, value), newTerm)
+    
+    return newTerm
+
+
+def GetCriticalPair(term1: List, term2: List, rule1: Tuple[str, str], rule2: Tuple[str, str], position: str) -> Tuple[List, List]:
+    rules = {}
+    
+    subterm1 = GetSubtermAtPosition(term1, position)
+    functionArity = LoadFunctions()[subterm1[0]]
+    for i in range(functionArity):
+        lhs = CreateInputStringFromTree(ChangeListToTree(GetSubtermAtPosition(subterm1, f"{i + 1}")))
+        rhs = CreateInputStringFromTree(ChangeListToTree(GetSubtermAtPosition(term2, f"{i + 1}")))
+        rules[lhs] = [rhs]
+        
+    # print(f"Before unification: {rules}")
+    
+    rules = Unification(rules)
+    
+    # print(f"After unification: {rules}")
+    
+    for key, value in rules.items():
+        result = ApplySubstitutionRecursive((key, value[0]), term1)
+        if result != None:
+            term1 = result
+    
+    # print(f"Term1 after applying all rules: {term1}")
+
+    critPair1Res = [ApplySubstitutionRecursive(rule1, term1), ApplySubstitutionRecursive(rule2, term1), ApplySubstitution(rule1, term1)]
+    critPair2Res = [ApplySubstitutionRecursive(rule1, term1), ApplySubstitutionRecursive(rule2, term1), ApplySubstitution(rule2, term1)]
+    
+    # print(f"CritPair1Res = {critPair1Res}")
+    # print(f"CritPair2Res = {critPair2Res}")
+    
+    critPair1 = [pair for pair in critPair1Res if pair != None][-1]
+    critPair2 = [pair for pair in critPair2Res if pair != None][-1]
+    
+    # print(f"Critical pair 1: {critPair1}") # f(y', z') ->               ["f", ["y'", "z'"]]
+    # print(f"Critical pair 2: {critPair2}") # f(y', f(f(y', z'), z)) ->  ["f", ["y'", "f", ["f", ["y'", "z'"], "z"]]]
+
+    return (critPair1, critPair2)
+
+
+# def GenerateAllCriticalPairs(rules: Dict[str, List]) -> List[Tuple[List, List]]:
+    
+    
+def DetermineCompleteness(identities: set, times: int = 1000) -> bool:
+    prevRules = set([])
+    currRules = set([])
+    identityList = list(identities)
+    
+    i = 0
+    while i < len(identityList):
+        identity = identityList[i]
+        term1 = ChangeTreeToList(CreateTree(identity[0]))
+        term2 = ChangeTreeToList(CreateTree(identity[1]))
+        
+        if LexicographicPathOrdering(term1, term2) == 1:
+            identities.discard(identity)
+            currRules.add((CreateInputStringFromTree(ChangeListToTree(term1)), CreateInputStringFromTree(ChangeListToTree(term2))))
+        elif LexicographicPathOrdering(term2, term1) == 1:
+            identities.discard(identity)
+            currRules.add((CreateInputStringFromTree(ChangeListToTree(term2)), CreateInputStringFromTree(ChangeListToTree(term1))))
+        else:
+            return False
+        
+        i += 1
+    
+    print(f"Identities before critical pairs: {identities}")
+    print(f"Rules before critical pairs: {currRules}")
+    
+    while currRules != prevRules:
+        prevRules = currRules
+        currRules = set([])
+        
+        # compute all critical pairs under our rule set prevRules
+        # reduce all critical pairs to normal form under our rule set prevRules
+        # if there is one critical pair in normal form which cannot be ordered, fail
+        # if critPair1 > critPair2, then currRules += (critPair1, critPair2)
+        # if critPair2 > critPair1, then currRules += (critPair2, critPair1)
+        
+        times -= 1
+        
+        if times == 0:
+            print(f"This has been going on for too long.")
+            return False
+
+    return True

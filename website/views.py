@@ -76,7 +76,7 @@ def functions():
 
 @views.route('/variables', methods=['GET', 'POST'])
 def variables():
-    variables = LoadVariables().keys()
+    variables = LoadVariables()
     
     if request.method == 'POST':
         if request.form.get('home'):
@@ -96,14 +96,14 @@ def variables():
                 DeleteVariable(v)
                 break
             
-        variables = LoadVariables().keys()
+        variables = LoadVariables()
     
     return render_template("variables.html", variables = variables)
 
 @views.route('/terms', methods=['GET', 'POST'])
 def terms():
     functions = LoadFunctions()
-    variables = LoadVariables().keys()
+    variables = LoadVariables()
     term_dictionary = session["terms"] if "terms" in session else {}
     terms = term_dictionary.keys()
     tree = ""
@@ -151,11 +151,58 @@ def createterm():
         if request.form.get('detect'):
             terms = LoadAllTerms()
             
-            if len(terms) >= 2:
-                term_1 = terms["term1"][1]
-                term_2 = terms["term2"][1]
-                print(LexicographicPathOrdering(term_1, term_2))
-                print(LoadPrecedences())
+            # if len(terms) >= 2:
+            #     term_1 = terms["term1"][1]
+            #     term_2 = terms["term2"][1]
+            #     print(LexicographicPathOrdering(term_1, term_2))
+            #     print(LoadPrecedences())
+            
+            # print(ApplySubstitution(("f(f(x, y), z)", "f(x, f(y, z))"), ["f", ["f", ["x", "y"], "i", ["f", ["x", "y"]]]]))
+            
+            # print(ApplySubstitution(("f(x', i(x'))", "e"), ["f", ["f", ["x", "y"], "i", ["f", ["x", "y"]]]]))
+            
+            # print(Unification({
+            #     "x": ["f(a)"],
+            #     "g(x, x)": ["g(x, y)"]
+            # }))
+            
+            # print(RuleEliminateSubstitutions({
+            #     "x": ["i(a)", "x"],
+            #     "g(x, y)": ["i(x)", "g(x, a)", "g(x, y)"],
+            #     "i(x)": ["i(y)", "y"],
+            #     "y": ["g(x, a)", "y"]
+            # }))
+            
+            # print(GetAllFunctionPositions(["f", ["f", ["x", "y"], "i", ["f", ["x", "i", ["y"]]]]]))
+            
+            # print(GetUniqueVariables(["f", ["f", ["x", "y"], "i", ["f", ["x", "i", ["y"]]]]]))
+            
+            # print(ReplaceCoincidingVariables(set(["x", "y"]), set(["x", "y", "a"]), ["f", ["f", ["x", "y"], "i", ["f", ["a", "i", ["y"]]]]]))
+            
+            # print(GetSubtermAtPosition(["f", ["f", ["x", "z"], "f", ["z", "i", ["y"]]]], "2_2_1"))
+            
+            # print(GetCriticalPair(["f", ["f", ["x", "y"], "z"]], 
+            #                         ["f", ["x'", "i", ["x'"]]],
+            #                         ("f(f(x, y), z)", "f(x, f(y, z))"),
+            #                         ("f(x, i(x))", "e"),
+            #                         ""))
+            
+            # print(GetCriticalPair(["f", ["f", ["x", "y"], "z"]], 
+            #                         ["f", ["i", ["x'"], "x'"]],
+            #                         ("f(f(x, y), z)", "f(x, f(y, z))"),
+            #                         ("f(i(x), x)", "e"),
+            #                         "1"))
+            
+            term1 = ["f", ["f", ["x", "y"], "f", ["y", "z"]]]
+            print(f"After replacement: {ReplaceCoincidingVariables(GetUniqueVariables(term1), GetUniqueVariables(term1), term1)}")
+            
+            print(GetCriticalPair(term1, 
+                                    ReplaceCoincidingVariables(GetUniqueVariables(term1), GetUniqueVariables(term1), term1),
+                                    ("f(f(x, y), f(y, z))", "y"),
+                                    ("f(f(x', y'), f(y', z'))", "y'"),
+                                    "1"))
+            
+            # print(DetermineCompleteness(set([("f(f(x, y), f(y, z))", "y")])))
             
         if request.form.get('save'):
             head = CreateTree(term_string)
@@ -163,7 +210,7 @@ def createterm():
             SaveTerm(tree, term_string, term_name)
     
     functions = LoadFunctions()
-    variables = LoadVariables().keys()
+    variables = LoadVariables()
     term_dictionary = session["terms"] if "terms" in session else {}
     terms = term_dictionary.keys()
     return render_template("createterm.html", term_name = term_name, term_string = term_string, functions = functions, variables = variables, terms = terms)

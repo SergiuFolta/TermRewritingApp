@@ -44,7 +44,7 @@ def CreateTree(input_str: str) -> Optional[Node]:
                 for _ in range(0, functions[str]): # then we add as many further Nodes as the function has possible arguments
                     current_node.next.append(Node(previous=current_node))
         elif str == '(':
-            if current_node.value in variables.keys():
+            if current_node.value in variables:
                 flash("ERROR: There's an open paranthesis, but we're not expecting any arguments!", category='error')
                 return None
             
@@ -87,7 +87,7 @@ def CreateTree(input_str: str) -> Optional[Node]:
                 return None
             
             current_node = current_node.next[child_index + 1]
-        elif str in variables.keys():
+        elif str in variables:
             if current_node.value != "":
                 flash("ERROR: More than one variable is trying to occupy the same node!", category='error')
                 return None
@@ -159,7 +159,8 @@ def ChangeListToTree(term: List) -> Optional[Node]:
         return None
     
     head = Node(term[0])
-    AppendChildrenToNode(term[1], head)
+    if len(term) > 1:
+        AppendChildrenToNode(term[1], head)
     
     return head
 
@@ -234,3 +235,19 @@ def FlattenList(ls: List) -> List:
             flatList.append(element)
     
     return flatList
+
+
+def ModifyListToArgumentList(ls: List) -> List:
+    argumentList = []
+    
+    ls = FlattenList(ls)
+    
+    functions = LoadFunctions()
+    
+    for term in ls:
+        if term in functions.keys():
+            argumentList.append(functions[term])
+        else:
+            argumentList.append(0)
+    
+    return argumentList

@@ -1,17 +1,17 @@
 from flask import session, flash
 from typing import List, Optional, Tuple, Dict
 
-def SaveVariables(variables: dict) -> None:
+def SaveVariables(variables: set) -> None:
     """
     This function saves the {variables} set in the current user session.
 
     Args:
         variables (set): set which includes the variables in our language
     """
-    session["variables"] = variables
+    session["variables"] = list(variables)
     
 
-def LoadVariables() -> dict:
+def LoadVariables() -> set:
     """
     This function loads the {variables} set from the current user session, 
     or creates a new set if it doesn't exist.
@@ -19,7 +19,7 @@ def LoadVariables() -> dict:
     Returns:
         set: the set containing the variables in our language
     """
-    return session["variables"] if "variables" in session else {}
+    return set(session["variables"]) if "variables" in session else set([])
 
 
 def SaveFunctions(functions: dict) -> None:

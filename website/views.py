@@ -193,16 +193,16 @@ def createterm():
             #                         ("f(i(x), x)", "e"),
             #                         "1"))
             
-            term1 = ["f", ["f", ["x", "y"], "f", ["y", "z"]]]
-            print(f"After replacement: {ReplaceCoincidingVariables(GetUniqueVariables(term1), GetUniqueVariables(term1), term1)}")
+            # term1 = ["f", ["f", ["x", "y"], "f", ["y", "z"]]]
+            # print(f"After replacement: {ReplaceCoincidingVariables(GetUniqueVariables(term1), GetUniqueVariables(term1), term1)}")
             
-            print(GetCriticalPair(term1, 
-                                    ReplaceCoincidingVariables(GetUniqueVariables(term1), GetUniqueVariables(term1), term1),
-                                    ("f(f(x, y), f(y, z))", "y"),
-                                    ("f(f(x', y'), f(y', z'))", "y'"),
-                                    "1"))
+            # print(GetCriticalPair(term1, 
+            #                         ReplaceCoincidingVariables(GetUniqueVariables(term1), GetUniqueVariables(term1), term1),
+            #                         ("f(f(x, y), f(y, z))", "y"),
+            #                         ("f(f(x', y'), f(y', z'))", "y'"),
+            #                         "1"))
             
-            # print(DetermineCompleteness(set([("f(f(x, y), f(y, z))", "y")])))
+            print(DetermineCompleteness(set([("f(f(x, y), f(y, z))", "y")])))
             
         if request.form.get('save'):
             head = CreateTree(term_string)

@@ -672,4 +672,4 @@ def Unification(substitutions : Dict[str, List]) -> Optional[Dict[str, List]]:
         
         times -= 1
         
-    return None 
+    return None

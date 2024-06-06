@@ -467,7 +467,7 @@ def GetUniqueVariables(term: List) -> set:
     return variables
 
 
-def ReplaceCoincidingVariables(vars1: set, vars2: set, term: List) -> List:
+def ReplaceCoincidingVariables(vars1: set, vars2: set, term: List, rule: Tuple[str, str]) -> Tuple[List, Tuple[str, str]]:
     nonuniqueVars = vars1.intersection(vars2)
     
     varRules = {}
@@ -485,10 +485,23 @@ def ReplaceCoincidingVariables(vars1: set, vars2: set, term: List) -> List:
             AddVariable(newVarName, False)
     
     newTerm = ChangeTreeToList(ChangeListToTree(term))
+    newSubstitutionInput = ChangeTreeToList(CreateTree(rule[0]))
+    newSubstitutionOutput = ChangeTreeToList(CreateTree(rule[1]))
+    
     for key, value in varRules.items():
         newTerm = ApplySubstitutionRecursive((key, value), newTerm)
+        inputRes = ApplySubstitutionRecursive((key, value), newSubstitutionInput)
+        if inputRes != None:
+            newSubstitutionInput = inputRes
+            
+        outputRes = ApplySubstitutionRecursive((key, value), newSubstitutionOutput)
+        if outputRes != None:
+            newSubstitutionOutput = outputRes
+            
+    newSubstitution = (CreateInputStringFromTree(ChangeListToTree(newSubstitutionInput)), 
+                        CreateInputStringFromTree(ChangeListToTree(newSubstitutionOutput)))
     
-    return newTerm
+    return(newTerm, newSubstitution)
 
 
 def GetCriticalPair(term1: List, term2: List, rule1: Tuple[str, str], rule2: Tuple[str, str], position: str) -> Tuple[List, List]:
@@ -529,8 +542,47 @@ def GetCriticalPair(term1: List, term2: List, rule1: Tuple[str, str], rule2: Tup
     return (critPair1, critPair2)
 
 
-# def GenerateAllCriticalPairs(rules: Dict[str, List]) -> List[Tuple[List, List]]:
+def GenerateAllCriticalPairs(rules: Dict[str, List]) -> List[Tuple[List, List]]:
+    rules = list(rules)
+    availableNums = [(num + 1) for num in range(len(rules))]
+    combinations = []
+    for i in range(len(availableNums)):
+        for j in range(i, len(availableNums)):
+            combinations.append((i, j))
     
+    critPairs = []
+    for combination in combinations:
+        term1 = ChangeTreeToList(CreateTree(rules[combination[0]][0]))
+        term2 = ChangeTreeToList(CreateTree(rules[combination[1]][0]))
+        term2, newRule = ReplaceCoincidingVariables(GetUniqueVariables(term1), GetUniqueVariables(term2), term2, rules[combination[1]])
+        
+        positions = GetAllFunctionPositions(term1)
+        
+        for position in positions:
+            if TermIsVariable(ChangeTreeToList(CreateTree(rules[combination[0]][1]))) and position == "":
+                continue
+        
+            print(f"----------------------------------------------------------------\n \
+                Attempting to find critical pair for:\n \
+                Term 1: {term1}\n \
+                Term 2: {term2}\n \
+                Rule 1: {rules[combination[0]]}\n \
+                Rule 2: {newRule}\n \
+                Position: {position}")
+            
+            critPair = GetCriticalPair(
+                term1,
+                term2,
+                rules[combination[0]],
+                newRule,
+                position
+            )
+        
+            if critPair != (None, None):
+                critPairs.append(critPair)
+    
+    return critPairs
+
     
 def DetermineCompleteness(identities: set, times: int = 1000) -> bool:
     prevRules = set([])
@@ -554,12 +606,15 @@ def DetermineCompleteness(identities: set, times: int = 1000) -> bool:
         
         i += 1
     
-    print(f"Identities before critical pairs: {identities}")
     print(f"Rules before critical pairs: {currRules}")
     
     while currRules != prevRules:
-        prevRules = currRules
-        currRules = set([])
+        prevRules = currRules.copy()
+        
+        # compute all critical pairs under our rule set prevRules
+        critPairs = GenerateAllCriticalPairs(prevRules)
+        print(f"Prev Rules = {prevRules}")
+        print(f"Crit Pairs = {critPairs}")
         
         # compute all critical pairs under our rule set prevRules
         # reduce all critical pairs to normal form under our rule set prevRules

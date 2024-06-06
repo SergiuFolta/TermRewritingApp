@@ -175,8 +175,8 @@ def RuleDecomposeSubstitutions(substitutions: dict, verbose: bool = False) -> di
                 term2 = ChangeTreeToList(CreateTree(output))
                 
                 for arg1, arg2 in zip(term1[1], term2[1]):
-                    str1 = CreateInputStringFromTree(ChangeListToTree(arg1))
-                    str2 = CreateInputStringFromTree(ChangeListToTree(arg2))
+                    str1 = arg1 if type(arg1) == str else CreateInputStringFromTree(ChangeListToTree(arg1))
+                    str2 = arg2 if type(arg2) == str else CreateInputStringFromTree(ChangeListToTree(arg2))
                     
                     if str1 in modified_substitutions.keys():
                         if str2 not in modified_substitutions[str1]:
@@ -556,8 +556,8 @@ def ApplySubstitution(substitution : Tuple[str, str], term : List) -> Optional[L
     inputArgumentList = ModifyListToArgumentList(inputList)
     termArgumentList = ModifyListToArgumentList(term)
     
-    print(f"Input argument list: {inputArgumentList}")
-    print(f"Term argument list: {termArgumentList}")
+    # print(f"Input argument list: {inputArgumentList}")
+    # print(f"Term argument list: {termArgumentList}")
     
     flatInput = FlattenList(inputList)
     flatTerm = FlattenList(term)
@@ -634,7 +634,7 @@ def ApplySubstitution(substitution : Tuple[str, str], term : List) -> Optional[L
     newSubstitution = (CreateInputStringFromTree(ChangeListToTree(newSubstitutionInput)), 
                         CreateInputStringFromTree(ChangeListToTree(newSubstitutionOutput)))
     
-    print(f"New substituion: {newSubstitution}")
+    print(f"New substitution: {newSubstitution}")
     return ApplySubstitutionRecursive(newSubstitution, term)
 
 

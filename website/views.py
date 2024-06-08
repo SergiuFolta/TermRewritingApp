@@ -6,6 +6,10 @@ views = Blueprint('views', __name__)
 
 @views.route('/', methods=['GET', 'POST'])
 def home():
+    functions = {"f": 2, "e": 0, "i": 1}
+    variables = set(["x", "y", "z", "a", "w"])
+    SaveFunctions(functions)
+    SaveVariables(variables)
     functions = LoadFunctions()
     variables = LoadVariables()
     substitutions = LoadSubstitutions()
@@ -202,7 +206,19 @@ def createterm():
             #                         ("f(f(x', y'), f(y', z'))", "y'"),
             #                         "1"))
             
-            print(DetermineCompleteness(set([("f(f(x, y), f(y, z))", "y")])))
+            # print(DetermineCompleteness(set([("f(f(x, y), f(y, z))", "y")]))) # true, yeeeey
+            
+            # print(DetermineCompleteness(set([("g(x, f(y, z))", "f(g(x, y), g(x, z))"), ("g(f(u, v), w)", "f(g(u, w), g(v, w))")])))
+            # f = +
+            # g = *
+            
+            # print(ApplySubstitution(("f(x', f(f(y', w), w))", "f(x', f(y', f(w, w)))"), ['f', ['f', ['x', 'y'], 'z']]))
+            
+            print(DetermineCompleteness(set([
+                ("f(f(x, y), z)", "f(x, f(y, z))"),
+                ("f(i(x), x)", "e"),
+                ("f(e, x)", "x")
+            ])))
             
         if request.form.get('save'):
             head = CreateTree(term_string)

@@ -2,6 +2,7 @@ from flask import session, flash
 from typing import List
 from .database import *
 from .representation_changes import ChangeTreeToList, CreateTree, CreateInputStringFromTree, ChangeListToTree, ModifyListToArgumentList
+from .variables import AddVariable
 
 def ModifySubstitution(old_substitution_input: str, old_substitution_output: str, 
                         new_substitution_input: str, new_substitution_output: str) -> None:
@@ -122,10 +123,10 @@ def RuleDeleteSubstitutions(substitutions: dict, verbose: bool = False) -> dict:
         dict: {substitutions} after removing all entries satisfying the rule above
     """
     modified_substitutions = {}
-    for key, value in substitutions.items():
-        modified_substitutions[key] = []
-        for entry in value:
-            modified_substitutions[key].append(entry)
+    for lhs in substitutions.keys():
+        modified_substitutions[lhs] = []
+        for rhs in substitutions[lhs]:
+            modified_substitutions[lhs].append(rhs)
     
     for input in substitutions.keys():
         for output in substitutions[input]:
@@ -153,10 +154,10 @@ def RuleDecomposeSubstitutions(substitutions: dict, verbose: bool = False) -> di
         dict: {substitutions} after decomposing all entries satisfying the rule above
     """
     modified_substitutions = {}
-    for key, value in substitutions.items():
-        modified_substitutions[key] = []
-        for entry in value:
-            modified_substitutions[key].append(entry)
+    for lhs in substitutions.keys():
+        modified_substitutions[lhs] = []
+        for rhs in substitutions[lhs]:
+            modified_substitutions[lhs].append(rhs)
     
     for input in substitutions.keys():
         firstTerm = input.find("(") # this is a function if this is found
@@ -173,11 +174,46 @@ def RuleDecomposeSubstitutions(substitutions: dict, verbose: bool = False) -> di
             if firstTerm == secondTerm: # if the function symbol is the same
                 term1 = ChangeTreeToList(CreateTree(input))
                 term2 = ChangeTreeToList(CreateTree(output))
+
+                # print(f"Term1: {term1}")
+                # print(f"Term2: {term2}")
                 
-                for arg1, arg2 in zip(term1[1], term2[1]):
-                    str1 = arg1 if type(arg1) == str else CreateInputStringFromTree(ChangeListToTree(arg1))
-                    str2 = arg2 if type(arg2) == str else CreateInputStringFromTree(ChangeListToTree(arg2))
+                term_args1 = term1[1]
+
+                subterms1 = []
+                i = 0
+                while i < len(term_args1):
+                    if i + 1 == len(term_args1): # last element
+                        subterms1.append([term_args1[i]])
+                        i += 1
+                    elif type(term_args1[i + 1]) == list: # this is a function
+                        subterms1.append([term_args1[i], term_args1[i + 1]])
+                        i += 2
+                    else: # this is a variable (or a constant function)
+                        subterms1.append([term_args1[i]])
+                        i += 1
+                        
+                term_args2 = term2[1]
+
+                subterms2 = []
+                i = 0
+                while i < len(term_args2):
+                    if i + 1 == len(term_args2): # last element
+                        subterms2.append([term_args2[i]])
+                        i += 1
+                    elif type(term_args2[i + 1]) == list: # this is a function
+                        subterms2.append([term_args2[i], term_args2[i + 1]])
+                        i += 2
+                    else: # this is a variable (or a constant function)
+                        subterms2.append([term_args2[i]])
+                        i += 1
+                
+                for i in range(len(subterms1)):
+                    str1 = CreateInputStringFromTree(ChangeListToTree(subterms1[i]))
+                    str2 = CreateInputStringFromTree(ChangeListToTree(subterms2[i]))
                     
+                    # print(f"Str1: {str1}")
+                    # print(f"Str2: {str2}")
                     if str1 in modified_substitutions.keys():
                         if str2 not in modified_substitutions[str1]:
                             modified_substitutions[str1].append(str2)
@@ -207,12 +243,13 @@ def RuleOrientSubstitutions(substitutions: dict, verbose: bool = False) -> dict:
         dict: {substitutions} after orienting all entries satisfying the rule above
     """
     modified_substitutions = {}
-    for key, value in substitutions.items():
-        modified_substitutions[key] = []
-        for entry in value:
-            modified_substitutions[key].append(entry)
+    for lhs in substitutions.keys():
+        modified_substitutions[lhs] = []
+        for rhs in substitutions[lhs]:
+            modified_substitutions[lhs].append(rhs)
     
     for input in substitutions.keys():
+        # in this case, we have a rule of the form {V -> V} or {V -> F}, where V is variable and F is function
         if TermIsVariable(ChangeTreeToList(CreateTree(input))):
             continue
         
@@ -249,10 +286,10 @@ def RuleEliminateSubstitutions(substitutions: dict, verbose: bool = False) -> di
         dict: {substitutions} after eliminating all entries satisfying the rule above
     """
     modified_substitutions = {}
-    for key, value in substitutions.items():
-        modified_substitutions[key] = []
-        for entry in value:
-            modified_substitutions[key].append(entry)
+    for lhs in substitutions.keys():
+        modified_substitutions[lhs] = []
+        for rhs in substitutions[lhs]:
+            modified_substitutions[lhs].append(rhs)
             
     # for input in substitutions.keys():        
     #     term = ChangeTreeToList(CreateTree(input))
@@ -308,17 +345,18 @@ def RuleEliminateSubstitutions(substitutions: dict, verbose: bool = False) -> di
     #                         flash(f"Successfully eliminated substitution {input2} to {output2}!")
     
     i = 0
-    while i < len(modified_substitutions.keys()):
-        input = list(modified_substitutions.keys())[i]
+    keys = list(modified_substitutions.keys())
+    while i < len(keys):
+        input = keys[i]
         i += 1
         term = ChangeTreeToList(CreateTree(input))
         
-        if TermIsVariable(term): # input needs to be a variable in some output
+        if TermIsVariable(term): # input needs to be a variable
             j = 0
             while j < len(modified_substitutions[input]):
                 output = modified_substitutions[input][j]
                 j += 1
-                if term[0] not in FlattenList(ChangeTreeToList(CreateTree(output))): # input is a variable and not in the rhs
+                if term[0] not in FlattenList(ChangeTreeToList(CreateTree(output))): # variable is not in the rhs
                     substitutionToApply = (input, output)
                     
                     left_rules = [] # this is where we store the rules which we might modify (in which the input is in the lhs)
@@ -417,7 +455,7 @@ def ApplySubstitutionRecursive(substitution : Tuple[str, str], term : List) -> O
 
     newTerm = ChangeTreeToList(ChangeListToTree(term))
 
-    if substitutionInput == newTerm:
+    if substitutionInput == newTerm and substitutionInput:
         newTerm = ChangeTreeToList(CreateTree(substitution[1]))
     else:
         subterms = []
@@ -437,15 +475,10 @@ def ApplySubstitutionRecursive(substitution : Tuple[str, str], term : List) -> O
                 subterms.append([term_args[i]])
                 i += 1
         
-        changed = False
         for index, subterm in enumerate(subterms):
             newerTerm = ApplySubstitutionRecursive(substitution, subterm)
             if newerTerm != None:
                 subterms[index] = newerTerm
-                changed = True
-        
-        if not changed:
-            return None
         
         newTerm[1] = []
         for subterm in subterms:
@@ -456,171 +489,154 @@ def ApplySubstitutionRecursive(substitution : Tuple[str, str], term : List) -> O
 
 
 def ApplySubstitution(substitution : Tuple[str, str], term : List) -> Optional[List]:
-    # f(f(x, y), z) -> f(x, f(y, z))
-    # f(f(x, y), i(f(x, y))) -> f(x, f(y, i(f(x, y))))
-    
-    # f(f(x, y), z) -> ["f", ["f", ["x", "y"], "z"]] ->                             [2, [0, 2, [0, 0]]]
-    # f(f(x, y), i(f(x, y))) -> ["f", ["f", ["x", "y"], "i", ["f", ["x", "y"]]]] ->  [2, [1, [2, [0, 0]], 2, [0, 0]]]
-
-    # [2, 2, 0, 0, 0]
-    # [2, 2, 0, 0, 1, 2, 0, 0]
-    # argumentCount = 2
-    # ()
-    # [2, 0, 0, 0]
-    # [2, 0, 0, 1, 2, 0, 0]
-    # argumentCount = 1
-    # ()
-    # [0]
-    # [1, 2, 0, 0]
-    # argumentCount = 1
-    # (x -> x, y -> y)
-    # []
-    # []
-    # argumentCount = 0
-    # (x -> x, y -> y, z -> i(f(x, y)))
-    
-    # [2, 0, 1, 0] f(x', i(x'))
-    # [2, 2, 0, 0, 1, 2, 0, 0] f(f(x, y), i(f(x, y)))
-    # argumentCount = 2
-    # ()
-    # [0, 1, 0]
-    # [2, 0, 0, 1, 2, 0, 0]
-    # argumentCount = 2
-    # ()
-    # [1, 0]
-    # [1, 2, 0, 0]
-    # argumentCount = 1
-    # (x' -> f(x, y))
-    # [0]
-    # [2, 0, 0]
-    # argumentCount = 1
-    # (x' -> f(x, y))
-    # []
-    # []
-    # argumentCount = 0
-    # (x' -> f(x, y))
-    
-    # [0]
-    # [2, 2, 0, 0, 2, 0, 0]
-    # [x]
-    # [f, f, x, y, f, y, z]
-    # argumentAmount = 0
-    # []
-    
-    # [0] -> [], [x] -> [], newVar = "x"
-    
-    # newTerm = "f("
-    # [2, 0, 0, 2, 0, 0]
-    # [f, x, y, f, y, z]
-    # argumentAmount = 1
-    # [2]
-    
-    # newTerm = "f(f("
-    # [0, 0, 2, 0, 0]
-    # [x, y, f, y, z]
-    # argumentAmount = 2
-    # [1, 2]
-    
-    # newTerm = "f(f(x,"
-    # [0, 2, 0, 0]
-    # [y, f, y, z]
-    # argumentAmount = 1
-    # [1, 1]
-    
-    # newTerm = "f(f(x,y),"
-    # [2, 0, 0]
-    # [f, y, z]
-    # argumentAmount = 0
-    # [1, 0]
-    
-    # newTerm = "f(f(x, y), f("
-    # [0, 0]
-    # [y, z]
-    # argumentAmount = 1
-    # [0, 2]
-    
-    # newTerm = "f(f(x, y), f(y, "
-    # [0]
-    # [z]
-    # argumentAmount = 0
-    # [0, 1]
-    
-    # newTerm = "f(f(x, y), f(y, z))"
-    # []
-    # []
-    # argumentAmount = -1
-    # [0, 0]
-    
+    # printTerm = ChangeTreeToList(ChangeListToTree(term))
+    # printSubstitution = (substitution[0], substitution[1])
     inputList = ChangeTreeToList(CreateTree(substitution[0]))
     
+    newTerm = ChangeTreeToList(ChangeListToTree(term))
+    
+    # f(x, y)
+    # f(f(z, u), w)
+    
     inputArgumentList = ModifyListToArgumentList(inputList)
-    termArgumentList = ModifyListToArgumentList(term)
+    termArgumentList = ModifyListToArgumentList(newTerm)
     
     # print(f"Input argument list: {inputArgumentList}")
     # print(f"Term argument list: {termArgumentList}")
     
     flatInput = FlattenList(inputList)
-    flatTerm = FlattenList(term)
-    rulesSet = set([])
-    argumentCount = 0
+    flatTerm = FlattenList(newTerm)
+    rulesSet = set([]) # rules for the variables
     
-    while inputArgumentList != [] and termArgumentList != []:
-        argumentCount += inputArgumentList[0]
-        argumentCount -= 1
-        
-        if inputArgumentList[0] == 0:
-            newVar = flatInput[0]
-            newTerm = ""
-            closeBracketNow = []
-            
-            argumentAmount = 0
-            while argumentAmount >= 0:
-                if len(flatTerm) != 0:
-                    newTerm += flatTerm[0]
+    functions = LoadFunctions()
+    variables = LoadVariables()
+    i, j = 0, 0
+    while i < len(flatInput) and j < len(flatTerm):
+        if flatInput[i] in variables:
+            if flatTerm[j] in variables:
+                for rule in rulesSet:
+                    if flatInput[i] == rule[0]:
+                        if flatTerm[j] != rule[1]: 
+                            # if we already have a rule of {flatInput[i]} goes to something and that something is not
+                            # {flatTerm[j]} then the same variable in the input appears under two different subterms in {term}
+                            return None
+                rulesSet.add((flatInput[i], flatTerm[j]))
+            else:
+                subterm = ""
+                argumentsLeft = []
                 
-                if len(termArgumentList) != 0 and termArgumentList[0] != 0:
-                    newTerm += "("
-                    argumentAmount += termArgumentList[0]
-                    closeBracketNow.append(termArgumentList[0])
+                while argumentsLeft != [] or subterm == "":
+                    subterm += flatTerm[j]
                     
-                    if len(closeBracketNow) >= 2:
-                        closeBracketNow[-2] -= 1
-                elif len(closeBracketNow) >= 1:
-                    closeBracketNow[-1] -= 1
-                    while closeBracketNow[-1] == 0:
-                        newTerm += ")"
-                        closeBracketNow.pop()
+                    if flatTerm[j] in functions:
+                        if termArgumentList[j] != 0: # function is not constant
+                            subterm += "("
                         
-                        if len(closeBracketNow) == 0:
-                            break
+                            argumentsLeft.append(termArgumentList[j])
+                            if len(argumentsLeft) >= 2:
+                                argumentsLeft[-2] -= 1
+                        else: # function is constant
+                            if len(argumentsLeft) >= 1:
+                                argumentsLeft[-1] -= 1
+                                
+                                while argumentsLeft != [] and argumentsLeft[-1] == 0:
+                                    subterm += ")"
+                                    argumentsLeft.pop()
+                            
+                                if argumentsLeft != []:
+                                    subterm += ", "
+                    else:
+                        argumentsLeft[-1] -= 1
+                        
+                        while argumentsLeft != [] and argumentsLeft[-1] == 0:
+                            subterm += ")"
+                            argumentsLeft.pop()
                     
-                    if len(closeBracketNow) >= 1 and closeBracketNow[-1] > 0:
-                        newTerm += ","
+                        if argumentsLeft != []:
+                            subterm += ", "
                     
-                argumentAmount -= 1 
-                if len(flatTerm) != 0:
-                    flatTerm = flatTerm[1:]
-                    termArgumentList = termArgumentList[1:]
-            
-            rulesSet.add((newVar, newTerm))
-            
-            inputArgumentList = inputArgumentList[1:]
-            flatInput = flatInput[1:]
-            continue
-        
-        inputArgumentList = inputArgumentList[1:]
-        termArgumentList = termArgumentList[1:]
-        flatInput = flatInput[1:]
-        flatTerm = flatTerm[1:]
+                    j += 1
+                    
+                    # if j == len(flatTerm):
+                    #     if argumentsLeft != []:
+                    #         return None
+                
+                for rule in rulesSet:
+                    if flatInput[i] == rule[0]:
+                        if subterm != rule[1]:
+                            # if we already have a rule of {flatInput[i]} goes to something and that something is not
+                            # {subterm} then the same variable in the input appears under two different subterms in {term}
+                            return None
+                
+                rulesSet.add((flatInput[i], subterm))
+                j -= 1
+        else:
+            if flatTerm[j] in variables: # if input is expecting a function, then the term has to be the same function
+                return None
+            else:
+                if flatInput[i] != flatTerm[j]: # if both are functions, they have to be the same function
+                    return None
+        i += 1
+        j += 1
+    
+    if i < len(flatInput) or j < len(flatTerm):
+        return None
+    
+    # print(f"Rules: {rulesSet}")
     
     rules = {}
     for rule in rulesSet:
         rules[rule[0]] = [rule[1]]
     
-    rules = Unification(rules)
+    # rules = Unification(rules)
     # print(rules)
     newSubstitutionInput = ChangeTreeToList(CreateTree(substitution[0]))
     newSubstitutionOutput = ChangeTreeToList(CreateTree(substitution[1]))
+    
+    # f(x, y)
+    # f(f(y, z), f(x, y))
+    # {x -> f(y, z), y -> f(x, y)}
+    # f(f(y, z), y)
+    # f(f(f(x, y), z), f(x, y))
+    variables = LoadVariables()
+    rulesForCoincidingVariables = {}
+    for lhs1 in rules.keys():
+        for lhs2 in rules.keys():
+            if lhs1 == lhs2:
+                continue
+            
+            outputListFlat = FlattenList(ChangeTreeToList(CreateTree(rules[lhs2][0])))
+            if lhs1 in outputListFlat:
+                newVar = lhs1
+                
+                found = True
+                while found:
+                    newVar = newVar + "'"
+                    found = False
+                    for key, value in rules.items():
+                        inputFlat = FlattenList(ChangeTreeToList(CreateTree(key)))
+                        outputFlat = FlattenList(ChangeTreeToList(CreateTree(value[0])))
+                        
+                        if newVar in inputFlat or newVar in outputFlat:
+                            found = True
+                            break
+                
+                if newVar not in variables:
+                    AddVariable(newVar, False)
+                
+                rulesForCoincidingVariables[lhs1] = [newVar]
+    
+    for lhs in rules.keys():
+        for rhs in rules[lhs]:
+            outputToChange = ChangeTreeToList(CreateTree(rhs))
+            
+            for key, value in rulesForCoincidingVariables.items():
+                newOutput = ApplySubstitutionRecursive((key, value[0]), outputToChange)
+                
+                if newOutput != None:
+                    outputToChange = newOutput
+            
+            rules[lhs] = [CreateInputStringFromTree(ChangeListToTree(outputToChange))]
     
     for key, value in rules.items():
         newInput = ApplySubstitutionRecursive((key, value[0]), newSubstitutionInput)
@@ -629,6 +645,18 @@ def ApplySubstitution(substitution : Tuple[str, str], term : List) -> Optional[L
             newSubstitutionInput = newInput
         
         if newOutput != None:
+            print(f"Applied {key} -> {value} on {newSubstitutionOutput} and got {newOutput}!")
+            newSubstitutionOutput = newOutput
+    
+    print(f"Rules for coinciding variables: {rulesForCoincidingVariables}")
+    for key, value in rulesForCoincidingVariables.items():
+        newInput = ApplySubstitutionRecursive((value[0], key), newSubstitutionInput)
+        newOutput = ApplySubstitutionRecursive((value[0], key), newSubstitutionOutput)
+        if newInput != None:
+            newSubstitutionInput = newInput
+        
+        if newOutput != None:
+            print(f"Applied {key} -> {value} on {newSubstitutionOutput} and got {newOutput}!")
             newSubstitutionOutput = newOutput
     
     newSubstitution = (CreateInputStringFromTree(ChangeListToTree(newSubstitutionInput)), 
@@ -650,10 +678,10 @@ def Unification(substitutions : Dict[str, List]) -> Optional[Dict[str, List]]:
     times = 1000
     while True:
         initial_substitutions = {}
-        for key, value in substitutions.items():
-            initial_substitutions[key] = []
-            for entry in value:
-                initial_substitutions[key].append(entry)
+        for lhs in substitutions.keys():
+            initial_substitutions[lhs] = []
+            for rhs in substitutions[lhs]:
+                initial_substitutions[lhs].append(rhs)
         
         substitutions = RuleDeleteSubstitutions(substitutions)
         # print(f"After deletion: {substitutions}")

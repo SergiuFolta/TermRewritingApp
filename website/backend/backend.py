@@ -507,6 +507,7 @@ def ReplaceCoincidingVariables(vars1: set, vars2: set, term: List, rule: Tuple[s
 
 
 def GetCriticalPair(term1: List, term2: List, rule1: Tuple[str, str], rule2: Tuple[str, str], position: str) -> Tuple[List, List]:
+    # find most general unifier between {term1} at position {position} and {term2}
     rules = {}
     
     subterm1 = GetSubtermAtPosition(term1, position)
@@ -514,7 +515,11 @@ def GetCriticalPair(term1: List, term2: List, rule1: Tuple[str, str], rule2: Tup
     for i in range(functionArity):
         lhs = CreateInputStringFromTree(ChangeListToTree(GetSubtermAtPosition(subterm1, f"{i + 1}")))
         rhs = CreateInputStringFromTree(ChangeListToTree(GetSubtermAtPosition(term2, f"{i + 1}")))
-        rules[lhs] = [rhs]
+        
+        if lhs in rules.keys():
+            rules[lhs].append(rhs)
+        else:
+            rules[lhs] = [rhs]
         
     # print(f"Before unification: {rules}")
     
@@ -522,15 +527,16 @@ def GetCriticalPair(term1: List, term2: List, rule1: Tuple[str, str], rule2: Tup
     
     # print(f"After unification: {rules}")
     
-    for key, value in rules.items():
-        result = ApplySubstitutionRecursive((key, value[0]), term1)
-        if result != None:
-            term1 = result
+    for lhs in rules.keys():
+        for rhs in rules[lhs]:
+            result = ApplySubstitutionRecursive((lhs, rhs), term1)
+            if result != None:
+                term1 = result
     
-    # print(f"Term1 after applying all rules: {term1}")
+    print(f"Term1 after applying all rules: {term1}")
 
-    critPair1Res = [ApplySubstitutionRecursive(rule1, term1), ApplySubstitutionRecursive(rule2, term1), ApplySubstitution(rule1, term1)]
-    critPair2Res = [ApplySubstitutionRecursive(rule1, term1), ApplySubstitutionRecursive(rule2, term1), ApplySubstitution(rule2, term1)]
+    critPair1Res = [ApplySubstitutionRecursive(rule1, term1), ApplySubstitution(rule1, term1)]
+    critPair2Res = [ApplySubstitutionRecursive(rule2, subterm1), ApplySubstitution(rule2, subterm1)]
     
     # print(f"CritPair1Res = {critPair1Res}")
     # print(f"CritPair2Res = {critPair2Res}")
@@ -543,6 +549,22 @@ def GetCriticalPair(term1: List, term2: List, rule1: Tuple[str, str], rule2: Tup
     
     critPair1 = critPair1Res[-1]
     critPair2 = critPair2Res[-1]
+    # apply mgu on the first result
+    for lhs in rules.keys():
+        for rhs in rules[lhs]:
+            result = ApplySubstitutionRecursive((lhs, rhs), critPair1)
+            if result != None:
+                critPair1 = result
+            
+    # apply mgu on the second result
+    for lhs in rules.keys():
+        for rhs in rules[lhs]:
+            result = ApplySubstitutionRecursive((lhs, rhs), critPair2)
+            if result != None:
+                critPair2 = result
+    
+    # replace the subterm at position {position} in {term1} with {critPair2}
+    critPair2 = ReplaceSubtermAtPosition(term1, critPair2, position)
     
     # print(f"Critical pair 1: {critPair1}") # f(y', z') ->               ["f", ["y'", "z'"]]
     # print(f"Critical pair 2: {critPair2}") # f(y', f(f(y', z'), z)) ->  ["f", ["y'", "f", ["f", ["y'", "z'"], "z"]]]
@@ -550,34 +572,39 @@ def GetCriticalPair(term1: List, term2: List, rule1: Tuple[str, str], rule2: Tup
     return (critPair1, critPair2)
 
 
-def GenerateAllCriticalPairs(rules: Dict[str, List], triedCombinations: set) -> Tuple[List[Tuple[List, List]], set]:
+def GenerateAllCriticalPairs(rules: Dict[str, List]) -> List[Tuple[List, List]]:
     rules = list(rules)
     availableNums = [(num + 1) for num in range(len(rules))]
     combinations = set([])
     for i in range(len(availableNums)):
-        for j in range(i, len(availableNums)):
-            if (i, j) not in triedCombinations:
-                combinations.add((i, j))
+        for j in range(i + 1, len(availableNums)):
+            combinations.add((i, j))
     
     critPairs = []
     for combination in combinations:
-        term1 = ChangeTreeToList(CreateTree(rules[combination[0]][0]))
-        term2 = ChangeTreeToList(CreateTree(rules[combination[1]][0]))
+        term1 = ChangeTreeToList(CreateTree(rules[combination[0]][0])) # left hand side of rule
+        term2 = ChangeTreeToList(CreateTree(rules[combination[1]][0])) # right hand side of rule
+        
+        # replace all coinciding variables in term2 and reflect changes in rule2 with newRule
         term2, newRule = ReplaceCoincidingVariables(set(GetUniqueVariables(term1)), set(GetUniqueVariables(term2)), term2, rules[combination[1]])
         
         positions = GetAllFunctionPositions(term1)
         
         for position in positions:
-            if TermIsVariable(ChangeTreeToList(CreateTree(rules[combination[0]][1]))) and position == "":
-                continue
+            # if TermIsVariable(ChangeTreeToList(CreateTree(rules[combination[0]][1]))) and position == "":
+            #     continue
         
-            print(f"----------------------------------------------------------------\n \
+            print(f"----------------------------------------------------------------------------------------\n \
                 Attempting to find critical pair for:\n \
                 Term 1: {term1}\n \
                 Term 2: {term2}\n \
                 Rule 1: {rules[combination[0]]}\n \
                 Rule 2: {newRule}\n \
                 Position: {position}")
+            
+            if GetSubtermAtPosition(term1, position)[0] != term2[0]:
+                print(f"Functions have different number of arguments!")
+                continue
             
             critPair = GetCriticalPair(
                 term1,
@@ -587,14 +614,15 @@ def GenerateAllCriticalPairs(rules: Dict[str, List], triedCombinations: set) -> 
                 position
             )
         
-            if critPair != (None, None):
+            if critPair != (None, None) and critPair[0] != critPair[1]:
+                print(f"Found critical pair {critPair}!")
                 critPairs.append(critPair)
     
-    return (critPairs, combinations)
+    return critPairs
 
 
 def RenameVariablesInCritPair(term1: List, term2: List) -> Tuple[List, List]:
-    variableOrder = ["x", "y", "z"]
+    variableOrder = ["x", "y", "z", "w", "a"]
     vars1 = GetUniqueVariables(term1)
     vars2 = GetUniqueVariables(term2)
     maxLen = max(len(vars1), len(vars2))
@@ -602,6 +630,8 @@ def RenameVariablesInCritPair(term1: List, term2: List) -> Tuple[List, List]:
     
     rules = []
     if maxLen > len(variableOrder):
+        print(f"Vars1 = {term1}")
+        print(f"Vars2 = {term2}")
         print(f"HEY I NEED MORE VARIABLES OVER HERE!!!!11!!!1!!!!!!!!1!1!!")
         return []
     
@@ -633,14 +663,16 @@ def DetermineCompleteness(identities: set, times: int = 1000) -> bool:
     
     i = 0
     while i < len(identityList):
-        identity = identityList[i]
-        term1 = ChangeTreeToList(CreateTree(identity[0]))
-        term2 = ChangeTreeToList(CreateTree(identity[1]))
+        identity = identityList[i] # take the current identity
+        term1 = ChangeTreeToList(CreateTree(identity[0])) # take left hand side of identity (s)
+        term2 = ChangeTreeToList(CreateTree(identity[1])) # take right hand side of identity (t)
         
-        if LexicographicPathOrdering(term1, term2) == 1:
+        if term1 == term2: # if s == t
+            identities.discard(identity)
+        elif LexicographicPathOrdering(term1, term2) == 1: # if s > t
             identities.discard(identity)
             currRules.add((CreateInputStringFromTree(ChangeListToTree(term1)), CreateInputStringFromTree(ChangeListToTree(term2))))
-        elif LexicographicPathOrdering(term2, term1) == 1:
+        elif LexicographicPathOrdering(term2, term1) == 1: # if t > s
             identities.discard(identity)
             currRules.add((CreateInputStringFromTree(ChangeListToTree(term2)), CreateInputStringFromTree(ChangeListToTree(term1))))
         else:
@@ -649,14 +681,13 @@ def DetermineCompleteness(identities: set, times: int = 1000) -> bool:
         i += 1
     
     print(f"Rules before critical pairs: {currRules}")
-    combinationsTried = set([])
+    
     while currRules != prevRules:
         prevRules = currRules.copy()
         
         print(f"Prev Rules = {prevRules}")
         # compute all critical pairs under our rule set prevRules
-        critPairs, newCombos = GenerateAllCriticalPairs(prevRules, combinationsTried)
-        combinationsTried = combinationsTried.union(newCombos)
+        critPairs = GenerateAllCriticalPairs(prevRules)
         print(f"Crit Pairs = {critPairs}")
         
         # reduce all critical pairs to normal form under our rule set prevRules
@@ -670,6 +701,8 @@ def DetermineCompleteness(identities: set, times: int = 1000) -> bool:
                 
                 if term1 == None:
                     term1 = newPair[0]
+                else:
+                    print(f"Applied rule {rule} on {newPair[0]} and obtained {term1}")
                 
                 if term2 == None:
                     term2 = newPair[1]
@@ -685,7 +718,8 @@ def DetermineCompleteness(identities: set, times: int = 1000) -> bool:
             elif LexicographicPathOrdering(newPair[1], newPair[0]) == 1: # if critPair2 > critPair1, then currRules += (critPair2, critPair1)
                 currRules.add((CreateInputStringFromTree(ChangeListToTree(newPair[1])),
                                 CreateInputStringFromTree(ChangeListToTree(newPair[0])))) 
-            else:
+            elif newPair[0] != newPair[1]:
+                print(f"Failed at pair with rules {prevRules}:\noldPair: {oldPair}\nnewPair: {newPair}")
                 return False # if there is one critical pair in normal form which cannot be ordered, fail
         
         times -= 1

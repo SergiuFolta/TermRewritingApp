@@ -240,6 +240,8 @@ def FlattenList(ls: List) -> List:
 def ModifyListToArgumentList(ls: List) -> List:
     argumentList = []
     
+    ls = ChangeTreeToList(ChangeListToTree(ls))
+    
     ls = FlattenList(ls)
     
     functions = LoadFunctions()

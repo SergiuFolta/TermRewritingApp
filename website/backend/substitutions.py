@@ -495,10 +495,23 @@ def ApplySubstitution(substitution : Tuple[str, str], term : List) -> Optional[L
     
     newTerm = ChangeTreeToList(ChangeListToTree(term))
     
-    # f(x, y)
-    # f(f(z, u), w)
+    # f(f(x, y), z)
     
-    inputArgumentList = ModifyListToArgumentList(inputList)
+    # f(f(x', y'), z')
+    # f(f(f(x', y'), z'), z)
+    
+    # f(f(x', y'), z') -> {x', y', z'}
+    # f(f(f(x', y'), z'), z) -> {x', y', z', z}
+    # {x' -> x'', y' -> y'', z' -> z''}
+    # f(f(f(x'', y''), z''), z)
+    
+    # f(f(x'', y''), f(z'', z))
+    # f(f(x', y'), f(z', z))
+    
+    res = ReplaceCoincidingVariables(set(GetUniqueVariables(inputList)), set(GetUniqueVariables(newTerm)), newTerm)
+    
+    newTerm, varRules = res[0], res[1]
+    
     termArgumentList = ModifyListToArgumentList(newTerm)
     
     # print(f"Input argument list: {inputArgumentList}")
@@ -598,45 +611,45 @@ def ApplySubstitution(substitution : Tuple[str, str], term : List) -> Optional[L
     # {x -> f(y, z), y -> f(x, y)}
     # f(f(y, z), y)
     # f(f(f(x, y), z), f(x, y))
-    variables = LoadVariables()
-    rulesForCoincidingVariables = {}
-    for lhs1 in rules.keys():
-        for lhs2 in rules.keys():
-            if lhs1 == lhs2:
-                continue
+    # variables = LoadVariables()
+    # rulesForCoincidingVariables = {}
+    # for lhs1 in rules.keys():
+    #     for lhs2 in rules.keys():
+    #         if lhs1 == lhs2:
+    #             continue
             
-            outputListFlat = FlattenList(ChangeTreeToList(CreateTree(rules[lhs2][0])))
-            if lhs1 in outputListFlat:
-                newVar = lhs1
+    #         outputListFlat = FlattenList(ChangeTreeToList(CreateTree(rules[lhs2][0])))
+    #         if lhs1 in outputListFlat:
+    #             newVar = lhs1
                 
-                found = True
-                while found:
-                    newVar = newVar + "'"
-                    found = False
-                    for key, value in rules.items():
-                        inputFlat = FlattenList(ChangeTreeToList(CreateTree(key)))
-                        outputFlat = FlattenList(ChangeTreeToList(CreateTree(value[0])))
+    #             found = True
+    #             while found:
+    #                 newVar = newVar + "'"
+    #                 found = False
+    #                 for key, value in rules.items():
+    #                     inputFlat = FlattenList(ChangeTreeToList(CreateTree(key)))
+    #                     outputFlat = FlattenList(ChangeTreeToList(CreateTree(value[0])))
                         
-                        if newVar in inputFlat or newVar in outputFlat:
-                            found = True
-                            break
+    #                     if newVar in inputFlat or newVar in outputFlat:
+    #                         found = True
+    #                         break
                 
-                if newVar not in variables:
-                    AddVariable(newVar, False)
+    #             if newVar not in variables:
+    #                 AddVariable(newVar, False)
                 
-                rulesForCoincidingVariables[lhs1] = [newVar]
+    #             rulesForCoincidingVariables[lhs1] = [newVar]
     
-    for lhs in rules.keys():
-        for rhs in rules[lhs]:
-            outputToChange = ChangeTreeToList(CreateTree(rhs))
+    # for lhs in rules.keys():
+    #     for rhs in rules[lhs]:
+    #         outputToChange = ChangeTreeToList(CreateTree(rhs))
             
-            for key, value in rulesForCoincidingVariables.items():
-                newOutput = ApplySubstitutionRecursive((key, value[0]), outputToChange)
+    #         for key, value in rulesForCoincidingVariables.items():
+    #             newOutput = ApplySubstitutionRecursive((key, value[0]), outputToChange)
                 
-                if newOutput != None:
-                    outputToChange = newOutput
+    #             if newOutput != None:
+    #                 outputToChange = newOutput
             
-            rules[lhs] = [CreateInputStringFromTree(ChangeListToTree(outputToChange))]
+    #         rules[lhs] = [CreateInputStringFromTree(ChangeListToTree(outputToChange))]
     
     for key, value in rules.items():
         newInput = ApplySubstitutionRecursive((key, value[0]), newSubstitutionInput)
@@ -645,25 +658,36 @@ def ApplySubstitution(substitution : Tuple[str, str], term : List) -> Optional[L
             newSubstitutionInput = newInput
         
         if newOutput != None:
-            print(f"Applied {key} -> {value} on {newSubstitutionOutput} and got {newOutput}!")
+            # print(f"Applied {key} -> {value} on {newSubstitutionOutput} and got {newOutput}!")
             newSubstitutionOutput = newOutput
     
-    print(f"Rules for coinciding variables: {rulesForCoincidingVariables}")
-    for key, value in rulesForCoincidingVariables.items():
-        newInput = ApplySubstitutionRecursive((value[0], key), newSubstitutionInput)
-        newOutput = ApplySubstitutionRecursive((value[0], key), newSubstitutionOutput)
-        if newInput != None:
-            newSubstitutionInput = newInput
+    # print(f"Rules for coinciding variables: {rulesForCoincidingVariables}")
+    # for key, value in rulesForCoincidingVariables.items():
+    #     newInput = ApplySubstitutionRecursive((value[0], key), newSubstitutionInput)
+    #     newOutput = ApplySubstitutionRecursive((value[0], key), newSubstitutionOutput)
+    #     if newInput != None:
+    #         newSubstitutionInput = newInput
         
-        if newOutput != None:
-            print(f"Applied {key} -> {value} on {newSubstitutionOutput} and got {newOutput}!")
-            newSubstitutionOutput = newOutput
+    #     if newOutput != None:
+    #         print(f"Applied {key} -> {value} on {newSubstitutionOutput} and got {newOutput}!")
+    #         newSubstitutionOutput = newOutput
     
     newSubstitution = (CreateInputStringFromTree(ChangeListToTree(newSubstitutionInput)), 
                         CreateInputStringFromTree(ChangeListToTree(newSubstitutionOutput)))
     
-    print(f"New substitution: {newSubstitution}")
-    return ApplySubstitutionRecursive(newSubstitution, term)
+    print(f"New substitution: {newSubstitution} on term {newTerm}")
+        
+    newTerm = ApplySubstitutionRecursive(newSubstitution, newTerm)
+    if newTerm == None:
+        return None
+    
+    for key, value in varRules.items():
+        tempTerm = ApplySubstitutionRecursive((value, key), newTerm)
+        
+        if tempTerm != None:
+            newTerm = tempTerm
+        
+    return newTerm
 
 
 def TermIsVariable(term : List) -> bool:
@@ -701,3 +725,40 @@ def Unification(substitutions : Dict[str, List]) -> Optional[Dict[str, List]]:
         times -= 1
         
     return None
+
+
+def GetUniqueVariables(term: List) -> List:
+    variables = []
+    
+    term = FlattenList(term)
+    for subterm in term:
+        if TermIsVariable([subterm]):
+            if subterm not in variables:
+                variables.append(subterm)
+    
+    return variables
+
+
+def ReplaceCoincidingVariables(vars1: set, vars2: set, term: List) -> Tuple[List, Dict[str, str]]:
+    nonuniqueVars = vars1.intersection(vars2)
+    
+    varRules = {}
+        
+    variables = LoadVariables()
+    flatTerm = FlattenList(term)
+
+    for var in nonuniqueVars:
+        newVarName = var + "'"
+        while newVarName in flatTerm:
+            newVarName += "'"
+        
+        varRules[var] = newVarName
+        if newVarName not in variables:
+            AddVariable(newVarName, False)
+    
+    newTerm = ChangeTreeToList(ChangeListToTree(term))
+    
+    for key, value in varRules.items():
+        newTerm = ApplySubstitutionRecursive((key, value), newTerm)
+    
+    return (newTerm, varRules)

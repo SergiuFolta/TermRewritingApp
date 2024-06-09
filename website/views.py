@@ -7,7 +7,7 @@ views = Blueprint('views', __name__)
 @views.route('/', methods=['GET', 'POST'])
 def home():
     functions = {"f": 2, "e": 0, "i": 1}
-    variables = set(["x", "y", "z", "a", "w"])
+    variables = set(["x", "y", "z", "a", "w", "x'", "y'", "z'", "b", "c", "d", "g"])
     SaveFunctions(functions)
     SaveVariables(variables)
     functions = LoadFunctions()
@@ -214,11 +214,39 @@ def createterm():
             
             # print(ApplySubstitution(("f(x', f(f(y', w), w))", "f(x', f(y', f(w, w)))"), ['f', ['f', ['x', 'y'], 'z']]))
             
-            print(DetermineCompleteness(set([
+            print(DetermineCompletenessHuet([
                 ("f(f(x, y), z)", "f(x, f(y, z))"),
-                ("f(i(x), x)", "e"),
-                ("f(e, x)", "x")
-            ])))
+                ("f(e, x)", "x"),
+                ("f(i(x), x)", "e")
+            ]))
+            
+            # print(GetCriticalPair(['f', ['f', ['x', 'y'], 'z']],
+            #                         ['f', ['i', ["x'"], "x'"]],
+            #                         ('f(f(x, y), z)', 'f(x, f(y, z))'),
+            #                         ("f(i(x'), x')", 'e'),
+            #                         "1"))
+            
+            # rule1 = "f(x', f(y', f(z', f(z, z))))"
+            # rule2 = "f(x', f(y', f(z', z)))"
+            # term1 = ChangeTreeToList(CreateTree(rule1))
+            # term2 = ChangeTreeToList(CreateTree(rule2))
+            # position = ""
+            
+            # firstOrdering = LexicographicPathOrdering(term1, term2)
+            # secondOrdering = LexicographicPathOrdering(term2, term1)
+            # if firstOrdering == 1:
+            #     flash(f"{term1} > {term2}")
+            # elif secondOrdering == 1:
+            #     flash(f"{term2} > {term1}")
+            # else:
+            #     flash(f"Cannot be ordered!")
+            
+            # if firstOrdering == 1 or secondOrdering == 1:
+            #     print(GetCriticalPair(term1,
+            #                             term2,
+            #                             rule1,
+            #                             rule2,
+            #                             position))
             
         if request.form.get('save'):
             head = CreateTree(term_string)

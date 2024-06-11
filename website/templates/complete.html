@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Determine Completeness{% endblock %}
+
+{% block content %}
+<div class="text-center">
+    
+<form method="POST" enctype="multipart/form-data">
+
+    <div class="h1 mt-5">
+        <b>Determine Completeness</b>
+    </div>
+
+    {% if substitutions %}
+    <label class="form-label mt-5"><b>Substitution Set:</b></label>
+    <div class="col">
+        <label class="form-label"><b>{</b></label>
+        {% set count = namespace(value=1) %}
+        {% for sub_in, list in substitutions.items() %}
+            {% for sub_out in list %}
+            <b>{{sub_in}} &#8776; {{sub_out}}</b>
+            {% if count.value != substitutions|length or loop.index != list|length %}<b>, </b>{%endif%}
+            {% endfor %}
+            {% set count.value = count.value + 1 %}
+        {% endfor %}
+        <b>}</b>
+    </div>
+    <label class="form-label mt-2"><b>Rule Set:</b></label>
+    {% else %}
+    <label class="form-label mt-5"><b>Substitution Set:</b></label>
+    {% endif %}
+
+    <div class="col">
+        <label class="form-label"><b>{</b></label>
+            {% for rule in rules %}
+                <b>{{rule[0]}} &#8594; {{rule[1]}}</b>
+                {% if loop.index != rules|length %}<b>, </b>{%endif%}
+            {% endfor %}
+        <b>}</b>
+    </div>
+
+    <div class="col mt-2">
+        <input class="btn btn-primary btn-lg"  type="submit" name="complete" value="Determine Completeness">
+    </div>
+
+    <div class="col mt-5">
+        <input class="btn btn-primary btn-lg"  type="submit" name="home" value="Home Page">
+    </div>
+
+</form>
+
+</div>
+{% endblock %}

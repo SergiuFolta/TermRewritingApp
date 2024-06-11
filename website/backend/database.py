@@ -79,7 +79,7 @@ def SaveTerm(term: List, input_str: str, name: str) -> None:
     term_dictionary = session["terms"] if "terms" in session else {}
     
     term_dictionary[name] = (input_str, term)
-        
+    print(term_dictionary)
     session["terms"] = term_dictionary
 
 

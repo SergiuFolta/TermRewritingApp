@@ -778,7 +778,7 @@ def DetermineCompleteness(identities: set, times: int = 1000) -> bool:
     return True
 
 
-def DetermineCompletenessHuet(identities: List, times: int = 1000) -> bool:
+def DetermineCompletenessHuet(identities: List, times: int = 1000) -> Tuple[bool, List]:
     # Initialization
     currIdentities = identities.copy() # E_i
     nextIdentities = [] # E_i+1
@@ -834,7 +834,7 @@ def DetermineCompletenessHuet(identities: List, times: int = 1000) -> bool:
                 
                 if lpo1 != 1 and lpo2 != 1:
                     print(f"Failed with rules {nextRules} and identities {nextIdentities}.")
-                    return None
+                    return (None, [])
                 # e)
                 else:
                     if lpo2 == 1:
@@ -965,4 +965,4 @@ def DetermineCompletenessHuet(identities: List, times: int = 1000) -> bool:
         times += 1
     
     print(f"Succeeded with rules {currRules}.")
-    return True
+    return (True, currRules)

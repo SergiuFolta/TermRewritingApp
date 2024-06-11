@@ -46,7 +46,16 @@ def home():
         
         if request.form.get('unification'):
             return redirect(url_for('views.unification', substitutions = substitutions))
-            
+        
+        if request.form.get('lpo'):
+            return redirect(url_for('views.lpo', substitutions = substitutions))
+        
+        if request.form.get('critpair'):
+            return redirect(url_for('views.critpair', substitutions = [], input_selected1 = "", input_selected2 = "", tree1 = "", tree2 = "", critPairRep = ""))
+           
+        if request.form.get('complete'):
+            return redirect(url_for('views.complete', substitutions = [], rules = []))
+          
     return render_template("home.html")
 
 @views.route('/functions', methods=['GET', 'POST'])
@@ -288,6 +297,7 @@ def replace():
             tree2 = LoadTerm(term_name2)
             if tree2 is not None:
                 tree2 = tree2[1]
+            print(term_name1)
                 
         if request.form.get('replace'):
             term_name1 = request.form.get('term1')
@@ -374,6 +384,137 @@ def unification():
         if request.form.get('unify'):
             old_substitutions = substitutions
             
-            #Unify
+            substitutions = Unification(substitutions)
     
     return render_template("unification.html", substitutions = substitutions, old_substitutions = old_substitutions)
+
+
+@views.route('/lpo', methods=['GET', 'POST'])
+def lpo():
+    substitutions = LoadSubstitutions()
+    old_substitutions = {}
+    
+    if request.method == 'POST':
+        if request.form.get('home'):
+            return redirect(url_for('views.home'))
+        
+        if request.form.get('lpo'):
+            old_substitutions = substitutions
+            new_substitutions = {}
+            
+            for input in substitutions:
+                for output in substitutions[input]:
+                    substitution = (input, output)
+                    term1 = ChangeTreeToList(CreateTree(substitution[0]))
+                    term2 = ChangeTreeToList(CreateTree(substitution[1]))
+                    
+                    if LexicographicPathOrdering(term1, term2) == 1:
+                        str1 = CreateInputStringFromTree(ChangeListToTree(term1))
+                        str2 = CreateInputStringFromTree(ChangeListToTree(term2))
+                        
+                        if str1 in new_substitutions.keys():
+                            new_substitutions[str1].append(str2)
+                        else:
+                            new_substitutions[str1] = [str2]
+                    elif LexicographicPathOrdering(term2, term1) == 1:
+                        str1 = CreateInputStringFromTree(ChangeListToTree(term1))
+                        str2 = CreateInputStringFromTree(ChangeListToTree(term2))
+                        
+                        if str2 in new_substitutions.keys():
+                            new_substitutions[str2].append(str1)
+                        else:
+                            new_substitutions[str2] = [str1]
+                
+            substitutions = new_substitutions
+    
+    return render_template("lpo.html", substitutions = substitutions, old_substitutions = old_substitutions)
+
+
+@views.route('/critpair', methods=['GET', 'POST'])
+def critpair():
+    substitutions = LoadSubstitutions()
+    substitutionsStr = []
+    for input in substitutions:
+        for output in substitutions[input]:
+            substitutionsStr.append(f"{input} -> {output}")
+    
+    tree1 = ""
+    rule1 = ""
+    tree2 = ""
+    rule2 = ""
+    critPairRep = ""
+    
+    if request.method == 'POST': 
+        if request.form.get('home'):
+            return redirect(url_for('views.home'))
+        
+        if request.form.get('display'):
+            rule1 = request.form.get('rule1')
+            input_selected1 = rule1[:(rule1.find("-") - 1)]
+            tree1 = ChangeTreeToList(CreateTree(input_selected1))
+            
+            rule2 = request.form.get('rule2')
+            input_selected2 = rule2[:(rule2.find("-") - 1)]
+            tree2 = ChangeTreeToList(CreateTree(input_selected2))
+                
+        if request.form.get('compute'):
+            rule1 = request.form.get('rule1')
+            input_selected1 = rule1[:(rule1.find("-") - 1)]
+            
+            rule2 = request.form.get('rule2')
+            input_selected2 = rule2[:(rule2.find("-") - 1)]
+            
+            replace_index = request.form.get('replace_index')
+            
+            #Create the new term
+            if replace_index == None: # if no radio button has been selected
+                flash("ERROR: You need to select a subterm from the left term!", category="error")
+            else:
+                replace_index = int(replace_index)
+                term1 = ChangeTreeToList(CreateTree(input_selected1))
+                term2 = ChangeTreeToList(CreateTree(input_selected2))
+                replace_position = GetPositionFromListIndex(term1, replace_index)
+                
+                output_selected1 = rule1[(rule1.find(">") + 2):]
+                output_selected2 = rule2[(rule2.find(">") + 2):]
+                
+                critPair = GetCriticalPair(term1, 
+                                            term2,
+                                            (input_selected1, output_selected1),
+                                            (input_selected2, output_selected2),
+                                            replace_position)
+                
+                print(critPair)
+                
+                if critPair != (None, None):
+                    critPairRep = f"{CreateInputStringFromTree(ChangeListToTree(critPair[0]))} > {CreateInputStringFromTree(ChangeListToTree(critPair[1]))}"
+                else:
+                    flash("ERROR: Could not find a critical pair for this configuration!", category="error")
+                
+    return render_template("critpair.html", substitutions = substitutionsStr, input_selected1 = rule1, input_selected2 = rule2, tree1 = tree1, tree2 = tree2, critPairRep = critPairRep)
+
+
+@views.route('/complete', methods=['GET', 'POST'])
+def complete():
+    substitutions = LoadSubstitutions()
+    rules = []
+    
+    if request.method == 'POST':
+        if request.form.get('home'):
+            return redirect(url_for('views.home'))
+        
+        if request.form.get('complete'):
+            new_substitutions = []
+            
+            for input in substitutions:
+                for output in substitutions[input]:
+                    substitution = (input, output)
+                    new_substitutions.append(substitution)
+            
+            res = DetermineCompletenessHuet(new_substitutions)
+            
+            if res[0] == True:
+                rules = res[1]
+    
+    return render_template("complete.html", substitutions = substitutions, rules = rules)
+

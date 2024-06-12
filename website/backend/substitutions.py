@@ -508,7 +508,8 @@ def ApplySubstitution(substitution : Tuple[str, str], term : List) -> Optional[L
     # f(f(x'', y''), f(z'', z))
     # f(f(x', y'), f(z', z))
     
-    res = ReplaceCoincidingVariables(set(GetUniqueVariables(inputList)), set(GetUniqueVariables(newTerm)), newTerm)
+    res = ReplaceCoincidingVariables(GetUniqueVariables(inputList), GetUniqueVariables(newTerm), newTerm, inputList)
+    # print(f"{newTerm} after replacing coinciding variables: {res[0]}")
     
     newTerm, varRules = res[0], res[1]
     
@@ -519,12 +520,13 @@ def ApplySubstitution(substitution : Tuple[str, str], term : List) -> Optional[L
     
     flatInput = FlattenList(inputList)
     flatTerm = FlattenList(newTerm)
-    rulesSet = set([]) # rules for the variables
-    
+    rulesSet = [] # rules for the variables
+
     functions = LoadFunctions()
     variables = LoadVariables()
     i, j = 0, 0
-    while i < len(flatInput) and j < len(flatTerm):
+    notFoundNow = False
+    while not notFoundNow and i < len(flatInput) and j < len(flatTerm):
         if flatInput[i] in variables:
             if flatTerm[j] in variables:
                 for rule in rulesSet:
@@ -532,8 +534,10 @@ def ApplySubstitution(substitution : Tuple[str, str], term : List) -> Optional[L
                         if flatTerm[j] != rule[1]: 
                             # if we already have a rule of {flatInput[i]} goes to something and that something is not
                             # {flatTerm[j]} then the same variable in the input appears under two different subterms in {term}
-                            return None
-                rulesSet.add((flatInput[i], flatTerm[j]))
+                            notFoundNow = True
+                            break
+                if (flatInput[i], flatTerm[j]) not in rulesSet:
+                    rulesSet.append((flatInput[i], flatTerm[j]))
             else:
                 subterm = ""
                 argumentsLeft = []
@@ -579,20 +583,59 @@ def ApplySubstitution(substitution : Tuple[str, str], term : List) -> Optional[L
                         if subterm != rule[1]:
                             # if we already have a rule of {flatInput[i]} goes to something and that something is not
                             # {subterm} then the same variable in the input appears under two different subterms in {term}
-                            return None
+                            notFoundNow = True
+                            break
                 
-                rulesSet.add((flatInput[i], subterm))
+                if (flatInput[i], subterm) not in rulesSet:
+                    rulesSet.append((flatInput[i], subterm))
                 j -= 1
         else:
             if flatTerm[j] in variables: # if input is expecting a function, then the term has to be the same function
-                return None
+                notFoundNow = True
+                break
             else:
                 if flatInput[i] != flatTerm[j]: # if both are functions, they have to be the same function
-                    return None
+                    notFoundNow = True
+                    break
         i += 1
         j += 1
     
     if i < len(flatInput) or j < len(flatTerm):
+        notFoundNow = True
+        
+    if notFoundNow:
+        # print(f"Rules {rulesSet} for term {newTerm}")
+        if len(newTerm) == 1:
+            return None
+        
+        subterms = []
+        i = 0
+        term_args = newTerm[1]
+        
+        while i < len(term_args):
+            if i + 1 == len(term_args): # last element
+                subterms.append([term_args[i]])
+                i += 1
+            elif type(term_args[i + 1]) == list: # this is a function
+                subterms.append([term_args[i], term_args[i + 1]])
+                i += 2
+            else: # this is a variable (or a constant function)
+                subterms.append([term_args[i]])
+                i += 1
+                
+        for index, subterm in enumerate(subterms):
+            newSubTerm = ApplySubstitution(substitution, subterm)
+            
+            if newSubTerm != None:
+                newTerm = ReplaceSubtermAtPosition(newTerm, newSubTerm, f"{index + 1}")
+                
+                for key, value in varRules.items():
+                    tempTerm = ApplySubstitutionRecursive((value, key), newTerm)
+                    
+                    if tempTerm != None:
+                        newTerm = tempTerm
+                return newTerm
+            
         return None
     
     # print(f"Rules: {rulesSet}")
@@ -602,7 +645,7 @@ def ApplySubstitution(substitution : Tuple[str, str], term : List) -> Optional[L
         rules[rule[0]] = [rule[1]]
     
     # rules = Unification(rules)
-    # print(rules)
+    # print(f"{rules} for term {term}")
     newSubstitutionInput = ChangeTreeToList(CreateTree(substitution[0]))
     newSubstitutionOutput = ChangeTreeToList(CreateTree(substitution[1]))
     
@@ -739,17 +782,21 @@ def GetUniqueVariables(term: List) -> List:
     return variables
 
 
-def ReplaceCoincidingVariables(vars1: set, vars2: set, term: List) -> Tuple[List, Dict[str, str]]:
-    nonuniqueVars = vars1.intersection(vars2)
+def ReplaceCoincidingVariables(vars1: List, vars2: List, term: List, rule: List) -> Tuple[List, Dict[str, str]]:
+    nonuniqueVars = []
+    for var in vars1:
+        if var in vars2:
+            nonuniqueVars.append(var)
     
     varRules = {}
         
     variables = LoadVariables()
     flatTerm = FlattenList(term)
+    flatRule = FlattenList(rule)
 
     for var in nonuniqueVars:
         newVarName = var + "'"
-        while newVarName in flatTerm:
+        while newVarName in flatTerm or newVarName in varRules.values() or newVarName in flatRule:
             newVarName += "'"
         
         varRules[var] = newVarName
@@ -762,3 +809,99 @@ def ReplaceCoincidingVariables(vars1: set, vars2: set, term: List) -> Tuple[List
         newTerm = ApplySubstitutionRecursive((key, value), newTerm)
     
     return (newTerm, varRules)
+
+
+def ReplaceSubtermAtPosition(original_term: List, replacement_term: List, position: str = "") -> List:
+    """
+    This function takes in a position from {original_term} and returns a new term created from replacing
+    everything from {position} in {original_term} with {replacement_term}.
+    This function does NOT modify {original_term} outside of its scope.
+    
+    Args:
+        original_term (List): list representing a term which will be built on top of
+        replacement_term (List): list representing a term which will replace a subterm from {original_term}
+        position (str): position of the subterm you'd like to get (in format "{number}_{number}_{number}").
+                        If you want to get the root, position is = ""
+
+    Returns:
+        List: returns the new term after replacement
+    """
+    if position == "":
+        return replacement_term
+    
+    indeces = position.split("_")
+    
+    head = ChangeListToTree(original_term)
+    
+    # f(f(f(x', y'), z'), z)
+    # f(f(x', y'), f(z', z))
+    # 1
+    
+    curr_node = head
+    for i in range(0, len(indeces)):
+        index = int(indeces[i]) - 1
+        if curr_node.next != None:
+            curr_node = curr_node.next[index] # f(f(x', y'))
+        else:
+            flash(f"ERROR: Cannot replace subterm at index {index + 1}! The position {position} doesn't exist.", category="error")
+            return []
+    
+    curr_node.previous.next[int(indeces[-1]) - 1] = ChangeListToTree(replacement_term)
+    
+    new_term = ChangeTreeToList(head)
+    
+    return new_term
+
+
+import re
+
+def create_regex_substitution(string1, string2):
+    # Define the regex patterns for functions and variables
+    functionsDict = LoadFunctions()
+    functions = []
+    for function in functionsDict.keys():
+        functions.append(function)
+        
+    variables = list(LoadVariables())
+    
+    variablesOrder = {}
+    flatList = FlattenList(ChangeTreeToList(CreateTree(string1)))
+    
+    current_index = 1
+    for term in flatList:
+        if TermIsVariable(term):
+            if term not in variablesOrder.keys():
+                variablesOrder[term] = current_index
+                current_index += 1
+
+# Generate regex patterns for string 1
+# Escape special characters in the string
+    regex_pattern1 = re.escape(string1)
+    variables1 = GetUniqueVariables(ChangeTreeToList(CreateTree(string1)))
+
+    for index,var in enumerate(variables1):
+        first_index = regex_pattern1.find(var)
+        if first_index != -1:
+            # Replace the first occurrence of var with a group
+            regex_pattern1 = regex_pattern1[:first_index] + "([\S]*)" + regex_pattern1[first_index + len(var):]
+            # Replace all other occurrences of var with replacement
+            regex_pattern1 = regex_pattern1.replace(var, "\\" + str(variablesOrder[var]))
+
+# Generate regex patterns for string 2
+    regex_pattern2 = string2
+    variables2 = GetUniqueVariables(ChangeTreeToList(CreateTree(string2)))
+
+    for index,var in enumerate(variables2):
+        replacement = r"\\" + str(variablesOrder[var])
+        regex_pattern2 = re.sub(var, replacement, regex_pattern2)
+
+    # Define the regular expression substitution
+    substitution_pattern = [(regex_pattern1, regex_pattern2)]
+
+    return substitution_pattern
+
+def transform_string(input_string, rules):
+    for rule in rules:
+        input_string = re.sub(rule[0], rule[1], input_string)
+    return input_string
+

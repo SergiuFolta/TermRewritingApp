@@ -225,17 +225,29 @@ def createterm():
             
             # print(ApplySubstitution(("f(x', f(f(y', w), w))", "f(x', f(y', f(w, w)))"), ['f', ['f', ['x', 'y'], 'z']]))
             
-            print(DetermineCompletenessHuet([
-                ("f(f(x, y), z)", "f(x, f(y, z))"),
-                ("f(e, x)", "x"),
-                ("f(i(x), x)", "e")
-            ]))
+            # print(DetermineCompletenessHuet([
+            #     ("f(f(x, y), z)", "f(x, f(y, z))"),
+            #     ("f(e, x)", "x"),
+            #     ("f(i(x), x)", "e")
+            # ]))
             
             # print(GetCriticalPair(['f', ['f', ['x', 'y'], 'z']],
             #                         ['f', ['i', ["x'"], "x'"]],
             #                         ('f(f(x, y), z)', 'f(x, f(y, z))'),
             #                         ("f(i(x'), x')", 'e'),
             #                         "1"))
+            
+            # Example usage:
+            string1 = "f(f(x,y),z)"
+            string2 = "f(x,f(y,z))"
+            rules = create_regex_substitution(string1, string2)
+            print(rules)
+
+            # Test the function
+            input_string = 'f(f(x\',f(y\',z\')),z)'
+            print(re.search(rules[0][0], input_string))
+            transformed_string = transform_string(input_string, rules)
+            print(transformed_string)
             
             # rule1 = "f(x', f(y', f(z', f(z, z))))"
             # rule2 = "f(x', f(y', f(z', z)))"
@@ -513,10 +525,9 @@ def complete():
                     substitution = (input, output)
                     new_substitutions.append(substitution)
             
-            res = DetermineCompletenessHuet(new_substitutions)
+            res = DetermineCompletenessHuet(new_substitutions, 3)
             
-            if res[0] == True:
-                rules = res[1]
+            rules = res[1]
     
     return render_template("complete.html", substitutions = substitutions, rules = rules)
 

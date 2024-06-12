@@ -778,7 +778,7 @@ def DetermineCompleteness(identities: set, times: int = 1000) -> bool:
     return True
 
 
-def DetermineCompletenessHuet(identities: List, times: int = 1000) -> Tuple[bool, List]:
+def DetermineCompletenessHuet(identities: List, maxTimes: int = 1000) -> Tuple[bool, List]:
     # Initialization
     currIdentities = identities.copy() # E_i
     nextIdentities = [] # E_i+1
@@ -790,7 +790,7 @@ def DetermineCompletenessHuet(identities: List, times: int = 1000) -> Tuple[bool
     i = 0
     
     times = 0
-    while (len(currIdentities) > 0 or False in ruleMarkings) and times < 4:
+    while (len(currIdentities) > 0 or False in ruleMarkings) and times < maxTimes:
         print(f"Run {times}:\n\tcurrIdentities: {currIdentities}\n\tcurrRules: {currRules}")
         while len(currIdentities) > 0:
             # a)

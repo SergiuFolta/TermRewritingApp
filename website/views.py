@@ -8,7 +8,8 @@ views = Blueprint('views', __name__)
 def home():
     functions = {"f": 2, "e": 0, "i": 1}
     variables = set(["x", "y", "z", "a", "w", "x'", "y'", "z'", "b", "c", "d", "g"])
-    substitutions = {"f(f(x, y), z)": ["f(x, f(y, z))"], "f(e, x)": ["x"], "f(i(x), x)": ["e"]}
+    # substitutions = {"f(f(x, y), z)": ["f(x, f(y, z))"], "f(e, x)": ["x"], "f(i(x), x)": ["e"]}
+    substitutions = {"f(f(x, y), z)": ["f(x, f(y, z))"], "f(e, x)": ["x"], "f(x, i(x))": ["e"]}
     SaveFunctions(functions)
     SaveVariables(variables)
     SaveSubstitutions(substitutions)
@@ -54,10 +55,10 @@ def home():
         
         if request.form.get('critpair'):
             return redirect(url_for('views.critpair', substitutions = [], input_selected1 = "", input_selected2 = "", tree1 = "", tree2 = "", critPairRep = ""))
-           
+        
         if request.form.get('complete'):
             return redirect(url_for('views.complete', substitutions = [], rules = []))
-          
+        
     return render_template("home.html")
 
 @views.route('/functions', methods=['GET', 'POST'])
@@ -171,6 +172,7 @@ def createterm():
             #     term_2 = terms["term2"][1]
             #     print(LexicographicPathOrdering(term_1, term_2))
             #     print(LoadPrecedences())
+            print(LexicographicPathOrdering(["i", ["f", ["x", "y"]]], ["f", ["i", ["y"], "i", ["x"]]]))
             
             # print(ApplySubstitution(("f(f(x, y), z)", "f(x, f(y, z))"), ["f", ["f", ["x", "y"], "i", ["f", ["x", "y"]]]]))
             
@@ -525,7 +527,7 @@ def complete():
                     substitution = (input, output)
                     new_substitutions.append(substitution)
             
-            res = DetermineCompletenessHuet(new_substitutions, 3)
+            res = DetermineCompletenessHuet(new_substitutions, 25)
             
             rules = res[1]
     

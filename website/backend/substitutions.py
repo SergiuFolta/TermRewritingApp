@@ -491,6 +491,7 @@ def ApplySubstitutionRecursive(substitution : Tuple[str, str], term : List) -> O
 def ApplySubstitution(substitution : Tuple[str, str], term : List) -> Optional[List]:
     # printTerm = ChangeTreeToList(ChangeListToTree(term))
     # printSubstitution = (substitution[0], substitution[1])
+    # print(f"Trying to apply {substitution} to {term}")
     inputList = ChangeTreeToList(CreateTree(substitution[0]))
     
     newTerm = ChangeTreeToList(ChangeListToTree(term))
@@ -718,7 +719,7 @@ def ApplySubstitution(substitution : Tuple[str, str], term : List) -> Optional[L
     newSubstitution = (CreateInputStringFromTree(ChangeListToTree(newSubstitutionInput)), 
                         CreateInputStringFromTree(ChangeListToTree(newSubstitutionOutput)))
     
-    print(f"New substitution: {newSubstitution} on term {newTerm}")
+    # print(f"New substitution: {newSubstitution} on term {newTerm}")
         
     newTerm = ApplySubstitutionRecursive(newSubstitution, newTerm)
     if newTerm == None:

@@ -789,10 +789,10 @@ def RenameVariablesInCritPair(term1: List, term2: List) -> Tuple[List, List]:
     return (newTerm1, newTerm2)
 
 
-def DetermineCompleteness(identities: set, times: int = 1000) -> bool:
+def DetermineCompleteness(identities: List, times: int = 1000) -> Tuple[bool, List]:
     prevRules = []
     currRules = []
-    identityList = list(identities)
+    identityList = identities
     
     i = 0
     while i < len(identityList):
@@ -801,23 +801,23 @@ def DetermineCompleteness(identities: set, times: int = 1000) -> bool:
         term2 = ChangeTreeToList(CreateTree(identity[1])) # take right hand side of identity (t)
         
         if term1 == term2: # if s == t
-            identities.discard(identity)
+            identities.remove(identity)
         elif LexicographicPathOrdering(term1, term2) == 1: # if s > t
-            identities.discard(identity)
+            identities.remove(identity)
             newRuleInput = CreateInputStringFromTree(ChangeListToTree(term1))
             newRuleOutput = CreateInputStringFromTree(ChangeListToTree(term2))
             
             if (newRuleInput, newRuleOutput) not in currRules:
                 currRules.append((newRuleInput, newRuleOutput))
         elif LexicographicPathOrdering(term2, term1) == 1: # if t > s
-            identities.discard(identity)
+            identities.remove(identity)
             newRuleInput = CreateInputStringFromTree(ChangeListToTree(term2))
             newRuleOutput = CreateInputStringFromTree(ChangeListToTree(term1))
             
             if (newRuleInput, newRuleOutput) not in currRules:
                 currRules.append((newRuleInput, newRuleOutput))
         else:
-            return False
+            return (False, currRules)
         
         i += 1
     
@@ -827,8 +827,14 @@ def DetermineCompleteness(identities: set, times: int = 1000) -> bool:
         prevRules = currRules.copy()
         
         print(f"Prev Rules = {prevRules}")
+        numOfRules = len(prevRules)
+        combos = []
+        for i in range(numOfRules):
+            for j in range(numOfRules):
+                combos.append((i, j))
+        
         # compute all critical pairs under our rule set prevRules
-        critPairs = GenerateAllCriticalPairs(prevRules)
+        critPairs = GenerateAllCriticalPairs(prevRules, combos)
         print(f"Crit Pairs = {critPairs}")
         
         # reduce all critical pairs to normal form under our rule set prevRules
@@ -867,7 +873,7 @@ def DetermineCompleteness(identities: set, times: int = 1000) -> bool:
                     currRules.append((newRuleInput, newRuleOutput))
             elif newPair[0] != newPair[1]:
                 print(f"Failed at pair with rules {prevRules}:\noldPair: {oldPair}\nnewPair: {newPair}")
-                return False # if there is one critical pair in normal form which cannot be ordered, fail
+                return (False, currRules) # if there is one critical pair in normal form which cannot be ordered, fail
         
         times -= 1
         
@@ -893,11 +899,11 @@ def DetermineCompletenessHuet(identities: List, maxTimes: int = 1000) -> Tuple[b
     
     times = 0
     while (len(currIdentities) > 0 or False in ruleMarkings) and times < maxTimes:
-        print(f"Run {times}:\n\tcurrIdentities: {currIdentities}\n\tcurrRules: {currRules}")
+        # print(f"Run {times}:\n\tcurrIdentities: {currIdentities}\n\tcurrRules: {currRules}")
         while len(currIdentities) > 0:
             # a)
             identity = currIdentities[0]
-            print(f"Looking at identity: {identity}")
+            # print(f"Looking at identity: {identity}")
             
             # b)
             term1 = ChangeTreeToList(CreateTree(identity[0]))
@@ -1093,7 +1099,7 @@ def DetermineCompletenessHuet(identities: List, maxTimes: int = 1000) -> Tuple[b
                     if i != j:
                         combosToGenerateCritPairsWith.append((i, j))
             
-            print(f"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\nGenerating all critical pairs with rules {rulesToGenerateCritPairsWith}")
+            # print(f"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\nGenerating all critical pairs with rules {rulesToGenerateCritPairsWith}")
             
             critPairs = GenerateAllCriticalPairs(rulesToGenerateCritPairsWith, combosToGenerateCritPairsWith)
             
@@ -1123,6 +1129,8 @@ def DetermineCompletenessHuet(identities: List, maxTimes: int = 1000) -> Tuple[b
                         
                         if not found:
                             # print(f"Added {(str1, str2)} to the set of identities!")
+                            with open("out.txt", "a") as f:
+                                f.write(f"Added critical pair {(str1, str2)} to the set of identities.\n")
                             nextIdentities.append((str1, str2))
             
             i += 1

@@ -1,0 +1,312 @@
+The input is: [('f(e, x)', 'x'), ('f(f(x, y), z)', 'f(x, f(y, z))'), ('f(i(x), x)', 'e')].
+Added critical pair ("f(f(x, f(y, z)), x')", "f(f(x, y), f(z, x'))") to the set of identities.
+Added critical pair ('f(e, f(x, y))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(e, f(x, y))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(i(x), f(x, y))', 'f(e, y)') to the set of identities.
+Added critical pair ('f(i(i(x)), y)', 'f(x, y)') to the set of identities.
+Added critical pair ('f(e, f(x, y))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(i(x), f(x, y))', 'f(e, y)') to the set of identities.
+Added critical pair ('f(i(x), f(f(x, y), z))', 'f(y, z)') to the set of identities.
+Added critical pair ('f(i(e), x)', 'x') to the set of identities.
+Added critical pair ('f(i(f(x, y)), f(x, f(y, z)))', 'z') to the set of identities.
+Added critical pair ('f(i(i(x)), e)', 'x') to the set of identities.
+Added critical pair ('f(e, f(x, y))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(i(x), f(x, y))', 'f(e, y)') to the set of identities.
+Added critical pair ('f(i(x), f(f(x, y), z))', 'f(y, z)') to the set of identities.
+Added critical pair ('f(i(i(x)), f(y, z))', 'f(f(x, y), z)') to the set of identities.
+Added critical pair ('f(x, i(x))', 'e') to the set of identities.
+Added critical pair ('f(i(i(x)), e)', 'x') to the set of identities.
+Added critical pair ('f(x, f(i(x), y))', 'y') to the set of identities.
+Added critical pair ('f(i(i(i(x))), f(x, y))', 'y') to the set of identities.
+Added critical pair ('f(e, f(x, y))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(i(x), f(x, y))', 'f(e, y)') to the set of identities.
+Added critical pair ('f(i(x), f(f(x, y), z))', 'f(y, z)') to the set of identities.
+Added critical pair ('f(i(i(x)), f(y, z))', 'f(f(x, y), z)') to the set of identities.
+Added critical pair ('f(i(e), f(x, y))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(i(i(x)), e)', 'x') to the set of identities.
+Added critical pair ('f(i(i(i(x))), f(x, y))', 'y') to the set of identities.
+Added critical pair ('f(i(i(e)), x)', 'x') to the set of identities.
+Added critical pair ("f(i(x), f(i(f(y, z)), f(f(y, f(z, x)), x')))", "x'") to the set of identities.
+Added critical pair ('f(i(f(i(f(x, y)), x)), z)', 'f(y, z)') to the set of identities.
+Added critical pair ("f(i(f(x, i(f(y, z)))), f(x, x'))", "f(y, f(z, x'))") to the set of identities.
+Added critical pair ('f(e, f(x, y))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(i(x), f(x, y))', 'f(e, y)') to the set of identities.
+Added critical pair ('f(i(x), f(f(x, y), z))', 'f(y, z)') to the set of identities.
+Added critical pair ('f(i(i(x)), f(y, z))', 'f(f(x, y), z)') to the set of identities.
+Added critical pair ('f(i(e), f(x, y))', 'f(x, y)') to the set of identities.
+Added critical pair ("f(i(f(x, y)), f(f(x, f(y, z)), x'))", "f(z, x')") to the set of identities.
+Added critical pair ('f(i(i(x)), e)', 'x') to the set of identities.
+Added critical pair ('f(i(i(i(x))), f(x, y))', 'y') to the set of identities.
+Added critical pair ('f(i(i(e)), x)', 'x') to the set of identities.
+Added critical pair ('f(i(i(f(x, y))), z)', 'f(x, f(y, z))') to the set of identities.
+Added critical pair ('f(i(x), f(e, f(x, y)))', 'y') to the set of identities.
+Added critical pair ('f(i(f(e, x)), f(x, y))', 'y') to the set of identities.
+Added critical pair ('f(i(f(x, e)), f(x, y))', 'y') to the set of identities.
+Added critical pair ("f(i(f(x, f(y, z))), f(f(x, y), f(z, x')))", "x'") to the set of identities.
+Added critical pair ("f(i(f(f(x, y), z)), f(x, f(y, f(z, x'))))", "x'") to the set of identities.
+Added critical pair ("f(i(f(x, f(y, z))), f(x, f(y, f(z, x'))))", "x'") to the set of identities.
+Added critical pair ('f(i(e), f(i(x), f(x, y)))', 'y') to the set of identities.
+Added critical pair ('f(i(f(i(f(x, y)), x)), e)', 'y') to the set of identities.
+Added critical pair ('f(i(f(x, i(y))), f(x, e))', 'y') to the set of identities.
+Added critical pair ('f(i(x), f(i(y), f(f(y, x), z)))', 'z') to the set of identities.
+Added critical pair ('f(i(f(i(x), x)), y)', 'y') to the set of identities.
+Added critical pair ('f(i(f(x, i(y))), f(x, z))', 'f(y, z)') to the set of identities.
+Added critical pair ('f(i(f(x, y)), f(i(i(x)), f(y, z)))', 'z') to the set of identities.
+Added critical pair ('f(i(f(i(i(x)), y)), f(x, f(y, z)))', 'z') to the set of identities.
+Added critical pair ('f(i(f(x, i(i(y)))), f(x, f(y, z)))', 'z') to the set of identities.
+Added critical pair ('f(i(x), f(i(e), f(x, y)))', 'y') to the set of identities.
+Added critical pair ('f(i(f(i(e), x)), f(x, y))', 'y') to the set of identities.
+Added critical pair ('f(i(f(x, i(e))), f(x, y))', 'y') to the set of identities.
+Added critical pair ('f(e, f(x, y))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(i(x), f(x, y))', 'f(e, y)') to the set of identities.
+Added critical pair ('f(i(x), f(f(x, y), z))', 'f(y, z)') to the set of identities.
+Added critical pair ('f(i(i(x)), f(y, z))', 'f(f(x, y), z)') to the set of identities.
+Added critical pair ('f(i(e), f(x, y))', 'f(x, y)') to the set of identities.
+Added critical pair ("f(i(f(x, y)), f(f(x, f(y, z)), x'))", "f(z, x')") to the set of identities.
+Added critical pair ('f(x, f(y, e))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(x, f(e, y))', 'f(x, y)') to the set of identities.
+Added critical pair ('i(e)', 'e') to the set of identities.
+Added critical pair ('f(i(i(x)), e)', 'x') to the set of identities.
+Added critical pair ('f(i(i(i(x))), f(x, y))', 'y') to the set of identities.
+Added critical pair ('f(i(i(e)), x)', 'x') to the set of identities.
+Added critical pair ('f(i(i(f(x, y))), z)', 'f(x, f(y, z))') to the set of identities.
+Added critical pair ('i(i(x))', 'f(x, e)') to the set of identities.
+Added critical pair ('f(i(x), f(e, f(x, y)))', 'y') to the set of identities.
+Added critical pair ('f(i(f(e, x)), f(x, y))', 'y') to the set of identities.
+Added critical pair ('f(i(f(x, e)), f(x, y))', 'y') to the set of identities.
+Added critical pair ("f(i(f(x, f(y, z))), f(f(x, y), f(z, x')))", "x'") to the set of identities.
+Added critical pair ("f(i(f(f(x, y), z)), f(x, f(y, f(z, x'))))", "x'") to the set of identities.
+Added critical pair ('f(i(e), f(i(x), f(x, y)))', 'y') to the set of identities.
+Added critical pair ('f(i(f(i(f(x, y)), x)), e)', 'y') to the set of identities.
+Added critical pair ('f(i(f(x, i(y))), f(x, e))', 'y') to the set of identities.
+Added critical pair ('f(i(x), f(i(y), f(f(y, x), z)))', 'z') to the set of identities.
+Added critical pair ('f(i(f(i(x), x)), y)', 'y') to the set of identities.
+Added critical pair ('f(i(f(x, y)), f(i(i(x)), f(y, z)))', 'z') to the set of identities.
+Added critical pair ('f(i(f(i(i(x)), y)), f(x, f(y, z)))', 'z') to the set of identities.
+Added critical pair ('f(i(f(x, i(i(y)))), f(x, f(y, z)))', 'z') to the set of identities.
+Added critical pair ('f(i(x), f(i(e), f(x, y)))', 'y') to the set of identities.
+Added critical pair ('f(i(f(i(e), x)), f(x, y))', 'y') to the set of identities.
+Added critical pair ('f(i(f(x, i(e))), f(x, y))', 'y') to the set of identities.
+Added critical pair ('f(i(x), f(x, f(e, y)))', 'y') to the set of identities.
+Added critical pair ('f(i(f(x, y)), f(x, y))', 'e') to the set of identities.
+Added critical pair ('f(e, f(x, y))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(i(x), f(x, y))', 'f(e, y)') to the set of identities.
+Added critical pair ('f(i(x), f(f(x, y), z))', 'f(y, z)') to the set of identities.
+Added critical pair ("f(i(f(x, y)), f(f(x, f(y, z)), x'))", "f(z, x')") to the set of identities.
+Added critical pair ('f(x, f(y, e))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(x, f(e, y))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(x, f(y, i(f(x, y))))', 'e') to the set of identities.
+Added critical pair ('f(x, f(i(x), y))', 'f(e, y)') to the set of identities.
+Added critical pair ('f(i(e), x)', 'x') to the set of identities.
+Added critical pair ('f(i(i(x)), e)', 'x') to the set of identities.
+Added critical pair ('f(i(i(f(x, y))), z)', 'f(x, f(y, z))') to the set of identities.
+Added critical pair ('f(i(x), e)', 'i(x)') to the set of identities.
+Added critical pair ('f(i(x), f(e, f(x, y)))', 'y') to the set of identities.
+Added critical pair ('f(i(f(e, x)), f(x, y))', 'y') to the set of identities.
+Added critical pair ('f(i(f(x, e)), f(x, y))', 'y') to the set of identities.
+Added critical pair ("f(i(f(x, f(y, z))), f(f(x, y), f(z, x')))", "x'") to the set of identities.
+Added critical pair ("f(i(f(f(x, y), z)), f(x, f(y, f(z, x'))))", "x'") to the set of identities.
+Added critical pair ('f(i(e), f(i(x), f(x, y)))', 'y') to the set of identities.
+Added critical pair ('f(i(f(i(f(x, y)), x)), e)', 'y') to the set of identities.
+Added critical pair ('f(i(f(x, i(y))), f(x, e))', 'y') to the set of identities.
+Added critical pair ('f(i(x), f(i(y), f(f(y, x), z)))', 'z') to the set of identities.
+Added critical pair ('f(i(f(i(x), x)), y)', 'y') to the set of identities.
+Added critical pair ('f(i(x), f(x, f(e, y)))', 'y') to the set of identities.
+Added critical pair ('f(i(f(x, y)), f(x, y))', 'e') to the set of identities.
+Added critical pair ('f(i(e), f(x, f(i(x), y)))', 'y') to the set of identities.
+Added critical pair ('f(i(f(x, y)), f(x, e))', 'i(y)') to the set of identities.
+Added critical pair ('f(i(i(x)), y)', 'f(x, y)') to the set of identities.
+Added critical pair ('f(i(e), x)', 'x') to the set of identities.
+Added critical pair ('f(e, f(x, y))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(i(x), f(x, y))', 'f(e, y)') to the set of identities.
+Added critical pair ('f(i(x), f(f(x, y), z))', 'f(y, z)') to the set of identities.
+Added critical pair ("f(i(f(x, y)), f(f(x, f(y, z)), x'))", "f(z, x')") to the set of identities.
+Added critical pair ('f(x, f(y, e))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(x, f(e, y))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(x, f(i(x), y))', 'f(e, y)') to the set of identities.
+Added critical pair ('f(x, f(y, f(i(f(x, y)), z)))', 'z') to the set of identities.
+Added critical pair ('f(x, f(f(i(x), y), z))', 'f(y, z)') to the set of identities.
+Added critical pair ('f(i(i(x)), e)', 'x') to the set of identities.
+Added critical pair ('f(i(i(f(x, y))), z)', 'f(x, f(y, z))') to the set of identities.
+Added critical pair ('f(i(x), e)', 'i(x)') to the set of identities.
+Added critical pair ('f(i(x), f(e, f(x, y)))', 'y') to the set of identities.
+Added critical pair ('f(i(f(e, x)), f(x, y))', 'y') to the set of identities.
+Added critical pair ('f(i(f(x, e)), f(x, y))', 'y') to the set of identities.
+Added critical pair ("f(i(f(x, f(y, z))), f(f(x, y), f(z, x')))", "x'") to the set of identities.
+Added critical pair ("f(i(f(f(x, y), z)), f(x, f(y, f(z, x'))))", "x'") to the set of identities.
+Added critical pair ('f(i(e), f(i(x), f(x, y)))', 'y') to the set of identities.
+Added critical pair ('f(i(f(i(f(x, y)), x)), e)', 'y') to the set of identities.
+Added critical pair ('f(i(f(x, i(y))), f(x, e))', 'y') to the set of identities.
+Added critical pair ('f(i(x), f(i(y), f(f(y, x), z)))', 'z') to the set of identities.
+Added critical pair ('f(i(f(i(x), x)), y)', 'y') to the set of identities.
+Added critical pair ('f(i(x), f(x, f(e, y)))', 'y') to the set of identities.
+Added critical pair ('f(i(f(x, y)), f(x, y))', 'e') to the set of identities.
+Added critical pair ('f(i(e), f(x, f(i(x), y)))', 'y') to the set of identities.
+Added critical pair ('f(i(f(x, y)), f(x, e))', 'i(y)') to the set of identities.
+Added critical pair ('f(i(x), f(y, f(f(i(y), x), z)))', 'z') to the set of identities.
+Added critical pair ('f(i(f(x, i(x))), y)', 'y') to the set of identities.
+Added critical pair ('f(i(f(x, y)), f(x, z))', 'f(i(y), z)') to the set of identities.
+Added critical pair ('f(x, e)', 'i(i(x))') to the set of identities.
+Added critical pair ('f(i(x), i(f(i(y), i(x))))', 'y') to the set of identities.
+Added critical pair ('f(i(e), x)', 'x') to the set of identities.
+Added critical pair ('f(e, f(x, y))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(i(x), f(x, y))', 'f(e, y)') to the set of identities.
+Added critical pair ('f(i(x), f(f(x, y), z))', 'f(y, z)') to the set of identities.
+Added critical pair ('f(x, f(y, e))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(x, f(e, y))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(x, f(i(x), y))', 'f(e, y)') to the set of identities.
+Added critical pair ('f(x, f(f(i(x), y), z))', 'f(y, z)') to the set of identities.
+Added critical pair ('f(i(f(x, i(y))), f(x, z))', 'f(y, z)') to the set of identities.
+Added critical pair ('f(i(f(x, y)), f(x, f(y, z)))', 'z') to the set of identities.
+Added critical pair ('f(i(i(x)), e)', 'x') to the set of identities.
+Added critical pair ('f(i(x), e)', 'i(x)') to the set of identities.
+Added critical pair ('f(i(i(f(x, i(y)))), y)', 'x') to the set of identities.
+Added critical pair ('i(f(e, i(x)))', 'x') to the set of identities.
+Added critical pair ('f(x, e)', 'i(i(x))') to the set of identities.
+Added critical pair ('f(f(x, i(y)), y)', 'x') to the set of identities.
+Added critical pair ('f(i(f(x, f(y, i(z)))), f(x, y))', 'z') to the set of identities.
+Added critical pair ('f(i(e), i(i(x)))', 'x') to the set of identities.
+Added critical pair ('f(i(e), x)', 'x') to the set of identities.
+Added critical pair ('f(e, f(x, y))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(i(x), f(x, y))', 'f(e, y)') to the set of identities.
+Added critical pair ('f(i(x), f(f(x, y), z))', 'f(y, z)') to the set of identities.
+Added critical pair ('f(x, f(y, e))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(x, f(e, y))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(x, f(i(x), y))', 'f(e, y)') to the set of identities.
+Added critical pair ('f(x, f(f(i(x), y), z))', 'f(y, z)') to the set of identities.
+Added critical pair ('f(i(f(x, i(y))), f(x, z))', 'f(y, z)') to the set of identities.
+Added critical pair ('f(e, e)', 'e') to the set of identities.
+Added critical pair ('f(i(f(x, y)), f(x, f(y, z)))', 'z') to the set of identities.
+Added critical pair ('f(i(i(x)), e)', 'x') to the set of identities.
+Added critical pair ('f(i(x), e)', 'i(x)') to the set of identities.
+Added critical pair ('f(i(i(f(x, i(y)))), y)', 'x') to the set of identities.
+Added critical pair ('f(e, f(e, x))', 'x') to the set of identities.
+Added critical pair ('i(f(e, i(x)))', 'x') to the set of identities.
+Added critical pair ('f(x, e)', 'i(i(x))') to the set of identities.
+Added critical pair ('f(f(x, i(y)), y)', 'x') to the set of identities.
+Added critical pair ('f(i(f(x, f(y, i(z)))), f(x, y))', 'z') to the set of identities.
+Added critical pair ('f(i(e), i(i(x)))', 'x') to the set of identities.
+Added critical pair ('f(i(f(x, e)), x)', 'e') to the set of identities.
+Added critical pair ('f(i(e), x)', 'x') to the set of identities.
+Added critical pair ('f(e, f(x, y))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(i(x), f(x, y))', 'f(e, y)') to the set of identities.
+Added critical pair ('f(i(x), f(f(x, y), z))', 'f(y, z)') to the set of identities.
+Added critical pair ('f(x, f(y, e))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(x, f(e, y))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(x, f(i(x), y))', 'f(e, y)') to the set of identities.
+Added critical pair ('f(x, f(f(i(x), y), z))', 'f(y, z)') to the set of identities.
+Added critical pair ('f(i(f(x, i(y))), f(x, z))', 'f(y, z)') to the set of identities.
+Added critical pair ('f(e, e)', 'e') to the set of identities.
+Added critical pair ('f(i(f(x, y)), f(x, f(y, z)))', 'z') to the set of identities.
+Added critical pair ('f(i(i(x)), e)', 'x') to the set of identities.
+Added critical pair ('f(i(x), e)', 'i(x)') to the set of identities.
+Added critical pair ('f(i(i(f(x, i(y)))), y)', 'x') to the set of identities.
+Added critical pair ('f(e, f(e, x))', 'x') to the set of identities.
+Added critical pair ('i(f(e, i(x)))', 'x') to the set of identities.
+Added critical pair ('f(x, e)', 'i(i(x))') to the set of identities.
+Added critical pair ('f(f(x, i(y)), y)', 'x') to the set of identities.
+Added critical pair ('f(i(f(x, f(y, i(z)))), f(x, y))', 'z') to the set of identities.
+Added critical pair ('f(i(e), i(i(x)))', 'x') to the set of identities.
+Added critical pair ('f(i(f(x, e)), x)', 'e') to the set of identities.
+Added critical pair ('f(x, f(f(y, i(f(x, y))), i(e)))', 'e') to the set of identities.
+Added critical pair ('f(i(e), x)', 'x') to the set of identities.
+Added critical pair ('f(x, i(f(e, x)))', 'e') to the set of identities.
+Added critical pair ('f(e, f(x, y))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(i(x), f(x, y))', 'f(e, y)') to the set of identities.
+Added critical pair ('f(i(x), f(f(x, y), z))', 'f(y, z)') to the set of identities.
+Added critical pair ('f(x, f(y, e))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(x, f(e, y))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(x, f(i(x), y))', 'f(e, y)') to the set of identities.
+Added critical pair ('f(x, f(f(i(x), y), z))', 'f(y, z)') to the set of identities.
+Added critical pair ('f(i(f(x, i(y))), f(x, z))', 'f(y, z)') to the set of identities.
+Added critical pair ('f(x, f(y, f(z, i(f(f(x, y), z)))))', 'e') to the set of identities.
+Added critical pair ('f(x, f(f(y, i(f(x, y))), z))', 'f(e, z)') to the set of identities.
+Added critical pair ('f(e, e)', 'e') to the set of identities.
+Added critical pair ('f(i(f(x, y)), f(x, f(y, z)))', 'z') to the set of identities.
+Added critical pair ('f(i(i(x)), e)', 'x') to the set of identities.
+Added critical pair ('f(i(x), e)', 'i(x)') to the set of identities.
+Added critical pair ('f(i(i(f(x, i(y)))), y)', 'x') to the set of identities.
+Added critical pair ('f(e, f(e, x))', 'x') to the set of identities.
+Added critical pair ('i(f(i(x), x))', 'e') to the set of identities.
+Added critical pair ('f(x, i(f(y, x)))', 'f(i(y), e)') to the set of identities.
+Added critical pair ('i(f(e, i(x)))', 'x') to the set of identities.
+Added critical pair ('f(x, e)', 'i(i(x))') to the set of identities.
+Added critical pair ('f(f(x, i(y)), y)', 'x') to the set of identities.
+Added critical pair ('i(f(x, i(x)))', 'e') to the set of identities.
+Added critical pair ('f(x, i(f(i(y), x)))', 'f(y, e)') to the set of identities.
+Added critical pair ('f(i(f(x, f(y, i(z)))), f(x, y))', 'z') to the set of identities.
+Added critical pair ('f(i(e), i(i(x)))', 'x') to the set of identities.
+Added critical pair ('f(i(f(x, e)), x)', 'e') to the set of identities.
+Added critical pair ('f(x, i(f(x, e)))', 'e') to the set of identities.
+Added critical pair ('f(e, f(x, i(x)))', 'e') to the set of identities.
+Added critical pair ('f(x, f(y, f(z, i(f(x, f(y, z))))))', 'e') to the set of identities.
+Added critical pair ('f(f(x, y), f(z, i(f(x, f(y, z)))))', 'e') to the set of identities.
+Added critical pair ('f(i(x), f(x, i(e)))', 'e') to the set of identities.
+Added critical pair ('f(i(x), f(f(x, y), i(y)))', 'e') to the set of identities.
+Added critical pair ('f(x, f(e, i(x)))', 'e') to the set of identities.
+Added critical pair ('f(x, f(i(x), i(e)))', 'e') to the set of identities.
+Added critical pair ('f(x, f(f(i(x), y), i(y)))', 'e') to the set of identities.
+Added critical pair ('f(i(f(x, i(y))), f(x, i(y)))', 'e') to the set of identities.
+Added critical pair ('f(i(i(x)), i(f(y, x)))', 'i(y)') to the set of identities.
+Added critical pair ('f(i(e), x)', 'x') to the set of identities.
+Added critical pair ('f(e, f(x, y))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(i(x), f(x, y))', 'f(e, y)') to the set of identities.
+Added critical pair ('f(i(x), f(f(x, y), z))', 'f(y, z)') to the set of identities.
+Added critical pair ('f(x, f(y, e))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(x, f(e, y))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(x, f(y, i(f(x, y))))', 'e') to the set of identities.
+Added critical pair ('f(x, f(i(x), y))', 'f(e, y)') to the set of identities.
+Added critical pair ('f(x, f(f(i(x), y), z))', 'f(y, z)') to the set of identities.
+Added critical pair ('f(i(f(x, i(y))), f(x, z))', 'f(y, z)') to the set of identities.
+Added critical pair ('f(e, e)', 'e') to the set of identities.
+Added critical pair ('f(i(f(x, y)), f(x, f(y, z)))', 'z') to the set of identities.
+Added critical pair ('f(i(i(x)), e)', 'x') to the set of identities.
+Added critical pair ('f(i(x), e)', 'i(x)') to the set of identities.
+Added critical pair ('f(i(i(f(x, i(y)))), y)', 'x') to the set of identities.
+Added critical pair ('f(e, f(e, x))', 'x') to the set of identities.
+Added critical pair ('f(i(i(f(x, y))), i(y))', 'x') to the set of identities.
+Added critical pair ('i(f(e, i(x)))', 'x') to the set of identities.
+Added critical pair ('i(f(e, x))', 'i(x)') to the set of identities.
+Added critical pair ('f(x, e)', 'i(i(x))') to the set of identities.
+Added critical pair ('f(f(x, i(y)), y)', 'x') to the set of identities.
+Added critical pair ('f(f(x, y), i(y))', 'x') to the set of identities.
+Added critical pair ('f(i(f(x, f(y, i(z)))), f(x, y))', 'z') to the set of identities.
+Added critical pair ('f(i(e), i(i(x)))', 'x') to the set of identities.
+Added critical pair ('f(i(f(x, e)), x)', 'e') to the set of identities.
+Added critical pair ('f(i(i(x)), i(f(i(y), x)))', 'y') to the set of identities.
+Added critical pair ('f(i(f(x, f(y, z))), f(x, y))', 'i(z)') to the set of identities.
+Added critical pair ('f(i(e), i(x))', 'i(x)') to the set of identities.
+Added critical pair ('f(i(x), i(y))', 'i(f(y, x))') to the set of identities.
+Added critical pair ('f(i(x), x)', 'i(e)') to the set of identities.
+Added critical pair ('f(i(e), x)', 'i(i(x))') to the set of identities.
+Added critical pair ('i(f(i(x), y))', 'f(i(y), x)') to the set of identities.
+Added critical pair ('f(i(x), i(f(y, i(x))))', 'i(y)') to the set of identities.
+Added critical pair ('f(i(e), x)', 'x') to the set of identities.
+Added critical pair ('f(e, f(x, y))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(i(x), f(x, y))', 'f(e, y)') to the set of identities.
+Added critical pair ('f(i(x), f(f(x, y), z))', 'f(y, z)') to the set of identities.
+Added critical pair ('f(x, f(y, e))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(x, f(e, y))', 'f(x, y)') to the set of identities.
+Added critical pair ('f(x, f(y, i(f(x, y))))', 'e') to the set of identities.
+Added critical pair ('f(x, f(i(x), y))', 'f(e, y)') to the set of identities.
+Added critical pair ('f(x, f(y, f(i(f(x, y)), z)))', 'z') to the set of identities.
+Added critical pair ('f(x, f(f(i(x), y), z))', 'f(y, z)') to the set of identities.
+Added critical pair ('f(e, e)', 'e') to the set of identities.
+Added critical pair ('f(f(i(x), i(y)), f(y, x))', 'e') to the set of identities.
+Added critical pair ('f(i(f(x, y)), f(x, f(y, z)))', 'z') to the set of identities.
+Added critical pair ('f(i(i(x)), e)', 'x') to the set of identities.
+Added critical pair ('f(i(x), e)', 'i(x)') to the set of identities.
+Added critical pair ('f(e, f(e, x))', 'x') to the set of identities.
+Added critical pair ('f(f(i(x), i(y)), f(f(y, x), z))', 'z') to the set of identities.
+Added critical pair ('f(f(x, y), f(i(y), i(x)))', 'e') to the set of identities.
+Added critical pair ('f(x, e)', 'i(i(x))') to the set of identities.
+Added critical pair ('f(f(x, y), f(f(i(y), i(x)), z))', 'z') to the set of identities.
+Added critical pair ('i(f(i(x), i(y)))', 'f(y, x)') to the set of identities.
+Added critical pair ('f(i(x), i(e))', 'i(x)') to the set of identities.
+Added critical pair ('f(i(x), i(f(y, z)))', 'i(f(y, f(z, x)))') to the set of identities.
+Added critical pair ('f(i(x), i(i(x)))', 'i(e)') to the set of identities.
+Added critical pair ('f(i(f(x, y)), i(i(x)))', 'i(y)') to the set of identities.
+Added critical pair ('f(i(e), i(x))', 'i(x)') to the set of identities.
+Added critical pair ('f(i(i(x)), i(x))', 'i(e)') to the set of identities.
+Added critical pair ('f(i(f(i(x), y)), i(x))', 'i(y)') to the set of identities.
+The output is: [('f(e, x)', 'x'), ('f(f(x, y), z)', 'f(x, f(y, z))'), ('f(i(x), x)', 'e'), ('f(i(x), f(x, y))', 'y'), ('f(x, e)', 'x'), ('f(x, i(x))', 'e'), ('f(x, f(i(x), y))', 'y'), ('i(e)', 'e'), ('i(i(x))', 'x'), ('i(f(y, x))', 'f(i(x), i(y))')].

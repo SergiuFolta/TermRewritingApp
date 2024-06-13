@@ -527,9 +527,13 @@ def complete():
                     substitution = (input, output)
                     new_substitutions.append(substitution)
             
+            with open("out.txt", "w+") as f:
+                f.write(f"The input is: {new_substitutions}.\n")
             res = DetermineCompletenessHuet(new_substitutions, 25)
             
             rules = res[1]
+            with open("out.txt", "a") as f:
+                f.write(f"The output is: {rules}.")
     
     return render_template("complete.html", substitutions = substitutions, rules = rules)
 

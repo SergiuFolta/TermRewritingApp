@@ -7,9 +7,9 @@ views = Blueprint('views', __name__)
 @views.route('/', methods=['GET', 'POST'])
 def home():
     functions = {"f": 2, "e": 0, "i": 1}
-    variables = set(["x", "y", "z", "a", "w", "x'", "y'", "z'", "b", "c", "d", "g"])
-    # substitutions = {"f(f(x, y), z)": ["f(x, f(y, z))"], "f(e, x)": ["x"], "f(i(x), x)": ["e"]}
-    substitutions = {"f(f(x, y), z)": ["f(x, f(y, z))"], "f(e, x)": ["x"], "f(x, i(x))": ["e"]}
+    variables = set(["x", "y", "z"])
+    substitutions = {"f(f(x, y), z)": ["f(x, f(y, z))"], "f(e, x)": ["x"], "f(i(x), x)": ["e"]}
+    # substitutions = {"f(f(x, y), z)": ["f(x, f(y, z))"], "f(e, x)": ["x"], "f(x, i(x))": ["e"]}
     SaveFunctions(functions)
     SaveVariables(variables)
     SaveSubstitutions(substitutions)
@@ -534,6 +534,11 @@ def complete():
             rules = res[1]
             with open("out.txt", "a") as f:
                 f.write(f"The output is: {rules}.")
+                
+            if res[0] == True:
+                flash(f"Found a convergent Term Rewriting System!")
+            else:
+                flash(f"ERROR: Couldn't find a convergent Term Rewriting System!", category="error")
     
     return render_template("complete.html", substitutions = substitutions, rules = rules)
 

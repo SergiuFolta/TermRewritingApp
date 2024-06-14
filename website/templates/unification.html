@@ -18,7 +18,7 @@
         {% set count = namespace(value=1) %}
         {% for sub_in, list in old_substitutions.items() %}
             {% for sub_out in list %}
-            <b>{{sub_in}} &#8594; {{sub_out}}</b>
+            <b>{{sub_in}} =? {{sub_out}}</b>
             {% if count.value != old_substitutions|length or loop.index != list|length %}<b>, </b>{%endif%}
             {% endfor %}
             {% set count.value = count.value + 1 %}
@@ -35,7 +35,7 @@
         {% set count = namespace(value=1) %}
         {% for sub_in, list in substitutions.items() %}
             {% for sub_out in list %}
-            <b>{{sub_in}} &#8776; {{sub_out}}</b>
+            <b>{{sub_in}} =? {{sub_out}}</b>
             {% if count.value != substitutions|length or loop.index != list|length %}<b>, </b>{%endif%}
             {% endfor %}
             {% set count.value = count.value + 1 %}

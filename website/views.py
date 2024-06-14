@@ -529,7 +529,7 @@ def complete():
             
             with open("out.txt", "w+") as f:
                 f.write(f"The input is: {new_substitutions}.\n")
-            res = DetermineCompletenessHuet(new_substitutions, 25)
+            res = DetermineCompleteness(new_substitutions, 25)
             
             rules = res[1]
             with open("out.txt", "a") as f:

@@ -638,7 +638,11 @@ def GenerateAllCriticalPairs(rules: List, combinations: List) -> List[Tuple[List
             )
         
             if critPair != (None, None) and critPair[0] != critPair[1]:
-                print(f"Found critical pair {critPair}!")
+                newRuleInput = CreateInputStringFromTree(ChangeListToTree(critPair[0]))
+                newRuleOutput = CreateInputStringFromTree(ChangeListToTree(critPair[1]))
+                
+                with open("out.txt", "a") as f:
+                    f.write(f"Added critical pair {(newRuleInput, newRuleOutput)} to the set of identities.\n")
                 critPairs.append(critPair)
     
     return critPairs
@@ -792,14 +796,14 @@ def RenameVariablesInCritPair(term1: List, term2: List) -> Tuple[List, List]:
 def DetermineCompleteness(identities: List, times: int = 1000) -> Tuple[bool, List]:
     prevRules = []
     currRules = []
-    identityList = identities
+    identityList = identities.copy()
     
     i = 0
     while i < len(identityList):
         identity = identityList[i] # take the current identity
         term1 = ChangeTreeToList(CreateTree(identity[0])) # take left hand side of identity (s)
         term2 = ChangeTreeToList(CreateTree(identity[1])) # take right hand side of identity (t)
-        
+        print(identity)
         if term1 == term2: # if s == t
             identities.remove(identity)
         elif LexicographicPathOrdering(term1, term2) == 1: # if s > t
@@ -839,25 +843,55 @@ def DetermineCompleteness(identities: List, times: int = 1000) -> Tuple[bool, Li
         
         # reduce all critical pairs to normal form under our rule set prevRules
         for critPair in critPairs:
-            oldPair = RenameVariablesInCritPair(critPair[0], critPair[1])
-            newPair = RenameVariablesInCritPair(critPair[0], critPair[1])
+            term1 = critPair[0]
+            term2 = critPair[1]
             
-            for rule in prevRules:
-                term1 = ApplySubstitution(rule, newPair[0])
-                term2 = ApplySubstitution(rule, newPair[1])
+            normalFormTerm1 = ChangeTreeToList(ChangeListToTree(term1))
+            normalFormTerm2 = ChangeTreeToList(ChangeListToTree(term2))
                 
-                if term1 == None:
-                    term1 = newPair[0]
-                else:
-                    print(f"Applied rule {rule} on {newPair[0]} and obtained {term1}")
+            ruleIndex = 0
+            while ruleIndex < len(currRules):
+                rule = currRules[ruleIndex]
+                # print(f"For rule: {rule} we now have terms {normalFormTerm1} and {normalFormTerm2}")
+                ruleInput = rule[0]
+                ruleOutput = rule[1]
                 
-                if term2 == None:
-                    term2 = newPair[1]
+                changed = False
+                while term1 != None or term2 != None:
+                    term1 = ApplySubstitution((ruleInput, ruleOutput), normalFormTerm1)
+                    term2 = ApplySubstitution((ruleInput, ruleOutput), normalFormTerm2)
+                    
+                    if term1 != None:
+                        # print(f"Changed normal form of term1 from {normalFormTerm1} to {term1} with rule {rule}")
+                        normalFormTerm1 = term1
+                        changed = True
+
+                    if term2 != None:
+                        # print(f"Changed normal form of term2 from {normalFormTerm2} to {term2} with rule {rule}")
+                        normalFormTerm2 = term2
+                        changed = True
                 
-                newPair = (term1, term2)
+                if changed:
+                    ruleIndex = -1
+                # if ruleInput == "f(y, y)" and identity[0] == 'i(f(i(y), i(f(i(f(x, i(y))), x))))':
+                #     return None
+                
+                term1 = ChangeTreeToList(CreateTree(identity[0]))
+                term2 = ChangeTreeToList(CreateTree(identity[1]))
+                ruleIndex += 1
             
-            print(f"New pair: {newPair}\n \
-                        Old pair: {oldPair}")
+            foundAlready = False
+            newNormalForms = RenameVariablesInCritPair(normalFormTerm1, normalFormTerm2)
+            normalFormTerm1 = newNormalForms[0]
+            normalFormTerm2 = newNormalForms[1]
+            newNormalForms = (CreateInputStringFromTree(ChangeListToTree(newNormalForms[0])),
+                                CreateInputStringFromTree(ChangeListToTree(newNormalForms[1])))
+            for rule in currRules:
+                if (newNormalForms[0], newNormalForms[1]) == rule or (newNormalForms[1], newNormalForms[0]) == rule:
+                    foundAlready = True
+                    break
+            
+            newPair = (normalFormTerm1, normalFormTerm2)
             
             if LexicographicPathOrdering(newPair[0], newPair[1]) == 1: # if critPair1 > critPair2, then currRules += (critPair1, critPair2)
                 newRuleInput = CreateInputStringFromTree(ChangeListToTree(newPair[0]))
@@ -872,7 +906,7 @@ def DetermineCompleteness(identities: List, times: int = 1000) -> Tuple[bool, Li
                 if (newRuleInput, newRuleOutput) not in currRules:
                     currRules.append((newRuleInput, newRuleOutput))
             elif newPair[0] != newPair[1]:
-                print(f"Failed at pair with rules {prevRules}:\noldPair: {oldPair}\nnewPair: {newPair}")
+                # print(f"Failed at pair with rules {prevRules}:\noldPair: {oldPair}\nnewPair: {newPair}")
                 return (False, currRules) # if there is one critical pair in normal form which cannot be ordered, fail
         
         times -= 1

@@ -11,7 +11,7 @@
         <b>Determine Completeness</b>
     </div>
 
-    {% if substitutions %}
+    
     <label class="form-label mt-5"><b>Substitution Set:</b></label>
     <div class="col">
         <label class="form-label"><b>{</b></label>
@@ -25,10 +25,10 @@
         {% endfor %}
         <b>}</b>
     </div>
+
+    {% if rules %}
+
     <label class="form-label mt-2"><b>Rule Set:</b></label>
-    {% else %}
-    <label class="form-label mt-5"><b>Substitution Set:</b></label>
-    {% endif %}
 
     <div class="col">
         <label class="form-label"><b>{</b></label>
@@ -38,6 +38,8 @@
             {% endfor %}
         <b>}</b>
     </div>
+    
+    {% endif %}
 
     <div class="col mt-2">
         <input class="btn btn-primary btn-lg"  type="submit" name="complete" value="Determine Completeness">

@@ -6,13 +6,13 @@ views = Blueprint('views', __name__)
 
 @views.route('/', methods=['GET', 'POST'])
 def home():
-    functions = {"f": 2, "e": 0, "i": 1}
-    variables = set(["x", "y", "z"])
-    substitutions = {"f(f(x, y), z)": ["f(x, f(y, z))"], "f(e, x)": ["x"], "f(i(x), x)": ["e"]}
+    # functions = {"f": 2, "e": 0, "i": 1}
+    # variables = set(["x", "y", "z"])
+    # substitutions = {"f(f(x, y), z)": ["f(x, f(y, z))"], "f(e, x)": ["x"], "f(i(x), x)": ["e"]}
     # substitutions = {"f(f(x, y), z)": ["f(x, f(y, z))"], "f(e, x)": ["x"], "f(x, i(x))": ["e"]}
-    SaveFunctions(functions)
-    SaveVariables(variables)
-    SaveSubstitutions(substitutions)
+    # SaveFunctions(functions)
+    # SaveVariables(variables)
+    # SaveSubstitutions(substitutions)
     functions = LoadFunctions()
     variables = LoadVariables()
     substitutions = LoadSubstitutions()
